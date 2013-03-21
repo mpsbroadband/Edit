@@ -25,6 +25,6 @@
 		</chain>
 	</resolvers>
 	<modules>
-		<module organisation="Organisation" name=".*" branch="${branch.name}" />
+		<module organisation="FooFighters" name=".*" branch="${branch.name}" />
 	</modules>
 </ivysettings>
