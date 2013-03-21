@@ -26,7 +26,7 @@
 
 		-->
 		<replace file="Properties\AssemblyInfo.cs">
-			<replacefilter token="1.0.0.0" value="${module.version}.0.0"/>
+			<replacefilter token="1.0.0.0" value="${module.version}.0"/>
 		</replace>
 	</target>
 
