@@ -32,6 +32,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Edit">
+      <HintPath>Dependencies\FooFighters\Edit\Edit.dll</HintPath>
+    </Reference>
+    <Reference Include="protobuf-net">
+      <HintPath>Dependencies\Protobuf-net\Protobuf-net\protobuf-net.dll</HintPath>
+    </Reference>
     <Reference Include="System.Core" />
     <Reference Include="System.Xml" />
   </ItemGroup>

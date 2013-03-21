@@ -6,5 +6,6 @@
   </publications>
   <dependencies>
     <dependency org="FooFighters" name="Edit" rev="latest.integration" />
+	<dependency org="Microsoft" name="WindowsAzureStorage" rev="2.0+" />
   </dependencies>  
 </ivy-module>
