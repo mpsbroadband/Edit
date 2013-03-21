@@ -5,7 +5,8 @@
     <artifact name="Edit.Tests" type="dll" />
   </publications>
   <dependencies>
-    <dependency org="FooFighters" name="Edit" rev="latest.integration" />
+	<dependency org="MSpec" name="Machine.Specification" rev="0.5+" />
+	<dependency org="FooFighters" name="Edit" rev="latest.integration" />
 	<dependency org="FooFighters" name="Edit.AzureTableStorage" rev="latest.integration" />
 	<dependency org="FooFighters" name="Edit.Protobuf" rev="latest.integration" />
   </dependencies>  
