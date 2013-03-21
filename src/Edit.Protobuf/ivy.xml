@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<ivy-module version="2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://ant.apache.org/ivy/schemas/ivy.xsd">
+  <info organisation="FooFighters" module="Edit.Protobuf"/>
+  <publications>
+    <artifact name="Edit.Protobuf" type="dll" />
+  </publications>
+  <dependencies>
+    <dependency org="FooFighters" name="Edit" rev="latest.integration" />
+	<dependency org="Protobuf-net" name="Protobuf-net" rev="2.0+" />
+  </dependencies>  
+</ivy-module>
