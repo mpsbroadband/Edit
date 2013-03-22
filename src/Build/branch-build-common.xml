@@ -1,0 +1,58 @@
+<project xmlns:ivy="antlib:org.apache.ivy.ant" name="common-branch-build-infrastructure">
+    <target name="clean">
+        <run-module-builds>
+            <targets>
+                <target name="clean" />
+            </targets>
+        </run-module-builds>
+    </target>
+	
+    <target name="retrieve">
+        <run-module-builds>
+            <targets>
+                <target name="retrieve" />
+            </targets>
+        </run-module-builds>
+    </target>
+	
+    <target name="build">
+        <run-module-builds>
+            <targets>
+                <target name="build" />
+            </targets>
+        </run-module-builds>
+    </target>
+	
+    <target name="publish-local">
+        <run-module-builds>
+            <targets>
+                <target name="publish-local" />
+            </targets>
+        </run-module-builds>
+    </target>
+
+    <target name="publish-release">
+        <run-module-builds>
+            <targets>
+                <target name="publish-release" />
+            </targets>
+        </run-module-builds>
+    </target>	
+
+    <macrodef name="run-module-builds">
+        <element name="targets" />
+        <sequential>
+            <property name="hudson.ivy.changedModules" value="" />
+            <ivy:settings />
+            <ivy:buildlist reference="build.path" ivyfilepath="ivy.xml" onMissingDescriptor="warn" leaf="${hudson.ivy.changedModules}">
+                <fileset dir="${basedir}" includes="*/build.xml" />
+            </ivy:buildlist>
+
+            <echo message="Build order: ${ivy.sorted.modules}" />
+
+            <subant buildpathref="build.path">
+                <targets />
+            </subant>
+        </sequential>
+    </macrodef>
+</project>
