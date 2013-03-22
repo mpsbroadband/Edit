@@ -5,7 +5,7 @@
     <artifact name="Edit" type="dll" />
   </publications>
   <dependencies>
-    <dependency org="Common.Logging" name="Common.Logging" rev="2.0+" />  
+    <dependency org="Common.Logging" name="Common.Logging" rev="2.1+" />  
 	<dependency org="NLog" name="NLog" rev="2.0+" />  
     <dependency org="Protobuf-net" name="Protobuf-net" rev="2.0+" />
   </dependencies>  
