@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<ivy-module version="2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://ant.apache.org/ivy/schemas/ivy.xsd">
+  <info organisation="FooFighters" module="Edit"/>
+  <publications>
+    <artifact name="Edit" type="dll" />
+  </publications>
+  <dependencies>
+    <dependency org="Common.Logging" name="Common.Logging" rev="2.0+" />  
+	<dependency org="NLog" name="NLog" rev="2.0+" />  
+    <dependency org="Protobuf-net" name="Protobuf-net" rev="2.0+" />
+  </dependencies>  
+</ivy-module>

@@ -1,0 +1,67 @@
+<project xmlns:ivy="antlib:org.apache.ivy.ant" name="common-build-infrastructure">
+	<target name="clean" depends="clean-output, clean-libraries"/>
+
+	<target name="clean-libraries">
+		<delete dir="${libraries.dir}" />
+	</target>	
+
+	<target name="clean-output">
+		<delete dir="${output.dir}" />
+	</target>
+
+	<target name="retrieve">
+		<ivy:settings/>
+		<ivy:retrieve pattern="${libraries.dir}/[organisation]/[module]/[artifact].[ext]" />
+	</target>
+
+	<target name="build" depends="clean, retrieve">
+		<antcall target="build-${module.type}" />
+	</target>
+
+	<target name="transform-assemlbyinfo">
+		<!--
+		
+		[assembly: AssemblyVersion("1.0.0.0")]
+		[assembly: AssemblyFileVersion("1.0.0.0")]
+
+		-->
+		<replace file="Properties\AssemblyInfo.cs">
+			<replacefilter token="1.0.0.0" value="${module.version}.0"/>
+		</replace>
+	</target>
+
+	<target name="build-dotnet" depends="transform-assemlbyinfo">
+		<exec executable="C:\Windows\Microsoft.NET\Framework\v4.0.30319\MSBuild.exe">
+			<arg value="/ignoreprojectextensions:.sln" />
+			<arg value="/property:OutputPath=${output.dir}\" />
+		</exec>
+	</target>
+
+	<target name="package" depends="build">
+	</target>
+
+	<target name="publish" depends="package">
+		<property name="ivy.resolver" value="local" />	
+		<property name="ivy.status" value="integration" />	
+		
+		<fail unless="ivy.status" message="ivy.status is undefined" />
+		<fail unless="ivy.resolver" message="ivy.resolver is undefined" />
+
+		<ivy:buildnumber organisation="${ivy.organisation}" module="${ivy.module}" revision="${module.revision}" branch="${branch.name}" />
+		<ivy:publish resolver="${ivy.resolver}" pubrevision="${ivy.new.revision}" forcedeliver="true" pubbranch="${branch.name}">
+			<artifacts pattern="${output.dir}/[artifact].[ext]" />
+		</ivy:publish>
+	</target>
+
+	<target name="publish-local">
+		<property name="module.revision" value="${module.version}-LOCAL" />
+	
+		<antcall target="publish" />
+	</target>
+
+	<target name="publish-release">
+		<property name="module.revision" value="${module.version}" />
+		
+		<antcall target="publish" />
+	</target>
+</project>

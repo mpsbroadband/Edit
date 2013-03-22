@@ -1,0 +1,30 @@
+<ivysettings>
+	<property name="ivy.default.ivy.pattern" value="[organisation]\[branch]\[module]\[revision]\ivy.xml" />
+	<property name="ivy.default.artifact.pattern" value="[organisation]\[branch]\[module]\[revision]\[artifact].[ext]" />
+	<settings defaultResolver="resolve-chain" defaultLatestStrategy="custom-latest-strategy" />
+	<latest-strategies>
+		<latest-revision name="custom-latest-strategy" usedefaultspecialmeanings="false">
+			<specialMeaning name="LOCAL" value="1" />
+		</latest-revision>
+	</latest-strategies>
+	<conflict-managers>
+		<latest-cm name="custom-conflict-manager" latest="custom-latest-strategy" />
+	</conflict-managers>
+	<resolvers>
+		<filesystem name="local">
+			<ivy pattern="${ivy.default.ivy.user.dir}\${ivy.default.ivy.pattern}" />
+			<artifact pattern="${ivy.default.ivy.user.dir}\${ivy.default.artifact.pattern}" />
+		</filesystem>
+		<sftp name="shared-sftp" user="read" userPassword="read" host="ff-build.cloudapp.net">
+			<ivy pattern="${ivy.default.ivy.pattern}" />
+			<artifact pattern="${ivy.default.artifact.pattern}" />
+		</sftp>
+		<chain name="resolve-chain" returnFirst="true">
+			<resolver ref="local" />
+			<resolver ref="shared-sftp" />
+		</chain>
+	</resolvers>
+	<modules>
+		<module organisation="FooFighters" name=".*" branch="${branch.name}" />
+	</modules>
+</ivysettings>
