@@ -3,6 +3,7 @@
   <info organisation="FooFighters" module="Edit"/>
   <publications>
     <artifact name="Edit" type="dll" />
+	<artifact name="Edit" type="pdb" />
   </publications>
   <dependencies>
     <dependency org="Common.Logging" name="Common.Logging" rev="2.1+" />  
