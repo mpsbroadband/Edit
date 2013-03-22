@@ -35,8 +35,8 @@
     <Reference Include="Common.Logging">
       <HintPath>Dependencies\Common.Logging\Common.Logging\Common.Logging.dll</HintPath>
     </Reference>
-    <Reference Include="Common.Logging.NLog">
-      <HintPath>Dependencies\Common.Logging\Common.Logging\Common.Logging.NLog.dll</HintPath>
+    <Reference Include="Common.Logging.NLog20">
+      <HintPath>Dependencies\Common.Logging\Common.Logging\Common.Logging.NLog20.dll</HintPath>
     </Reference>
     <Reference Include="Edit">
       <HintPath>Dependencies\FooFighters\Edit\Edit.dll</HintPath>

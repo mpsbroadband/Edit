@@ -3,6 +3,7 @@
   <info organisation="FooFighters" module="Edit.AzureTableStorage"/>
   <publications>
     <artifact name="Edit.AzureTableStorage" type="dll" />
+	<artifact name="Edit.AzureTableStorage" type="pdb" />
   </publications>
   <dependencies>
     <dependency org="FooFighters" name="Edit" rev="latest.integration" />

@@ -3,6 +3,7 @@
   <info organisation="FooFighters" module="Edit.Protobuf"/>
   <publications>
     <artifact name="Edit.Protobuf" type="dll" />
+	<artifact name="Edit.Protobuf" type="pdb" />
   </publications>
   <dependencies>
     <dependency org="FooFighters" name="Edit" rev="latest.integration" />
