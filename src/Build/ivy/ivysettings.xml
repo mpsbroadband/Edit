@@ -1,6 +1,6 @@
 <ivysettings>
-	<property name="ivy.default.ivy.pattern" value="[organisation]\[branch]\[module]\[revision]\ivy.xml" />
-	<property name="ivy.default.artifact.pattern" value="[organisation]\[branch]\[module]\[revision]\[artifact].[ext]" />
+	<property name="ivy.default.ivy.pattern" value="[organisation]/[branch]/[module]/[revision]/ivy.xml" />
+	<property name="ivy.default.artifact.pattern" value="[organisation]/[branch]/[module]/[revision]/[artifact].[ext]" />
 	<settings defaultResolver="resolve-chain" defaultLatestStrategy="custom-latest-strategy" />
 	<latest-strategies>
 		<latest-revision name="custom-latest-strategy" usedefaultspecialmeanings="false">
@@ -15,9 +15,9 @@
 			<ivy pattern="${ivy.default.ivy.user.dir}\${ivy.default.ivy.pattern}" />
 			<artifact pattern="${ivy.default.ivy.user.dir}\${ivy.default.artifact.pattern}" />
 		</filesystem>
-		<sftp name="shared-sftp" user="read" userPassword="read" host="ff-build.cloudapp.net">
-			<ivy pattern="${ivy.default.ivy.pattern}" />
-			<artifact pattern="${ivy.default.artifact.pattern}" />
+		<sftp name="shared-sftp" user="read" userPassword="read" host="ff-build.cloudapp.net" port="22">
+ 		<ivy pattern="${ivy.default.ivy.pattern}" />
+		<artifact pattern="${ivy.default.artifact.pattern}" />
 		</sftp>
 		<chain name="resolve-chain" returnFirst="true">
 			<resolver ref="local" />
