@@ -31,7 +31,7 @@
 	</target>
 
 	<target name="build-dotnet" depends="transform-assemlbyinfo">
-		<exec executable="C:\Windows\Microsoft.NET\Framework\v4.0.30319\MSBuild.exe">
+		<exec executable="C:\Windows\Microsoft.NET\Framework\v4.0.30319\MSBuild.exe" failonerror="true">
 			<arg value="/ignoreprojectextensions:.sln" />
 			<arg value="/property:OutputPath=${output.dir}\" />
 		</exec>
@@ -41,27 +41,39 @@
 	</target>
 
 	<target name="publish" depends="package">
-		<property name="ivy.resolver" value="local" />	
-		<property name="ivy.status" value="integration" />	
-		
-		<fail unless="ivy.status" message="ivy.status is undefined" />
-		<fail unless="ivy.resolver" message="ivy.resolver is undefined" />
+		<property name="module.revision" value="${module.version}" />
+			
+		<property name="ivy.resolver" value="local" />
+		<property name="ivy.status" value="integration" />
 
 		<ivy:buildnumber organisation="${ivy.organisation}" module="${ivy.module}" revision="${module.revision}" branch="${branch.name}" />
-		<ivy:publish resolver="${ivy.resolver}" pubrevision="${ivy.new.revision}" forcedeliver="true" pubbranch="${branch.name}">
+
+		<echo message="is.local = ${is.local}" />
+		
+		<condition property="new.revision" value="${ivy.new.revision}">
+			<not>  
+				<isset property="is.local"/>
+			</not>
+		</condition>		
+		
+		<echo message="new.revision = ${new.revision}" />
+		
+		<property name="new.revision" value="${ivy.revision}.0" />
+		
+		<echo message="new.revision = ${new.revision}" />
+	
+		<ivy:publish resolver="${ivy.resolver}" pubrevision="${new.revision}" forcedeliver="true" pubbranch="${branch.name}">
 			<artifacts pattern="${output.dir}/[artifact].[ext]" />
 		</ivy:publish>
 	</target>
 
 	<target name="publish-local">
-		<property name="module.revision" value="${module.version}-LOCAL" />
-	
+		<property name="is.local" value="true" />
+
 		<antcall target="publish" />
 	</target>
 
 	<target name="publish-release">
-		<property name="module.revision" value="${module.version}" />
-		
 		<antcall target="publish" />
 	</target>
 </project>
