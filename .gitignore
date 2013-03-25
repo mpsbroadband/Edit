@@ -108,5 +108,5 @@ Backup*/
 UpgradeLog*.XML
 
 # MPS
-[Oo]utput
-[Dd]ependencies
+[Oo]utput/
+[Dd]ependencies/
