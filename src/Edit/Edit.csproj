@@ -35,8 +35,8 @@
     <Reference Include="Common.Logging">
       <HintPath>Dependencies\Common.Logging\Common.Logging\Common.Logging.dll</HintPath>
     </Reference>
-    <Reference Include="Common.Logging.NLog">
-      <HintPath>Dependencies\Common.Logging\Common.Logging\Common.Logging.NLog.dll</HintPath>
+    <Reference Include="Common.Logging.NLog20">
+      <HintPath>Dependencies\Common.Logging\Common.Logging\Common.Logging.NLog20.dll</HintPath>
     </Reference>
     <Reference Include="NLog">
       <HintPath>Dependencies\NLog\NLog\NLog.dll</HintPath>
