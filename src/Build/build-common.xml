@@ -9,7 +9,7 @@
 		<delete dir="${output.dir}" />
 	</target>
 
-	<target name="retrieve">
+	<target name="retrieve" depends="clean">
 		<ivy:settings/>
 		<ivy:retrieve pattern="${libraries.dir}/[organisation]/[module]/[artifact].[ext]" />
 	</target>
