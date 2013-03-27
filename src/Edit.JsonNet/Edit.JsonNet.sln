@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Edit.Protobuf", "Edit.Protobuf.csproj", "{05987028-7355-4324-9CC8-DCA8A6FD81DB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Edit.JsonNet", "Edit.JsonNet.csproj", "{05987028-7355-4324-9CC8-DCA8A6FD81DB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

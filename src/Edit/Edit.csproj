@@ -41,9 +41,6 @@
     <Reference Include="NLog">
       <HintPath>Dependencies\NLog\NLog\NLog.dll</HintPath>
     </Reference>
-    <Reference Include="protobuf-net">
-      <HintPath>Dependencies\Protobuf-net\Protobuf-net\protobuf-net.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="Microsoft.CSharp" />
@@ -52,8 +49,6 @@
     <Compile Include="Chunk.cs" />
     <Compile Include="ChunkSet.cs" />
     <Compile Include="ConcurrencyException.cs" />
-    <Compile Include="Configuration\EventStoreConfigurator.cs" />
-    <Compile Include="Configuration\EventStoreSettings.cs" />
     <Compile Include="StreamStore.cs" />
     <Compile Include="Framer.cs" />
     <Compile Include="IStreamStore.cs" />

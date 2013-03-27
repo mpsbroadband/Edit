@@ -49,8 +49,8 @@
     <Reference Include="Edit.AzureTableStorage">
       <HintPath>Dependencies\FooFighters\Edit.AzureTableStorage\Edit.AzureTableStorage.dll</HintPath>
     </Reference>
-    <Reference Include="Edit.Protobuf">
-      <HintPath>Dependencies\FooFighters\Edit.Protobuf\Edit.Protobuf.dll</HintPath>
+    <Reference Include="Edit.JsonNet">
+      <HintPath>Dependencies\FooFighters\Edit.JsonNet\Edit.JsonNet.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Data.Edm, Version=5.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -68,22 +68,22 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>Dependencies\Microsoft\WindowsAzureStorage\Microsoft.WindowsAzure.Storage.dll</HintPath>
     </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>Dependencies\JsonNet\JsonNet\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="NLog">
       <HintPath>Dependencies\NLog\NLog\NLog.dll</HintPath>
-    </Reference>
-    <Reference Include="protobuf-net">
-      <HintPath>Dependencies\Protobuf-net\Protobuf-net\protobuf-net.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data.Services.Client" />
-    <Reference Include="System.Spatial, Version=5.0.2.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\System.Spatial.5.0.2\lib\net40\System.Spatial.dll</HintPath>
-    </Reference>
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Spatial, Version=5.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>Dependencies\Microsoft\WindowsAzureStorage\System.Spatial.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Program.cs" />

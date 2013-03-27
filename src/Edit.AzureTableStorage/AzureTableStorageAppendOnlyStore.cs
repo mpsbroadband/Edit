@@ -31,24 +31,24 @@ namespace Edit.AzureTableStorage
             await _cloudTable.CreateIfNotExistAsync();
         }
 
-        #region AppendAsync
+        #region WriteAsync
 
-        public async Task AppendAsync(string streamName, byte[] data, string expectedVersion)
+        public async Task WriteAsync(string streamName, byte[] data, string expectedVersion)
         {
-            await AppendAsync(streamName, data, Timeout.InfiniteTimeSpan, expectedVersion);
+            await WriteAsync(streamName, data, Timeout.InfiniteTimeSpan, expectedVersion);
         }
 
-        public async Task AppendAsync(string streamName, byte[] data, TimeSpan timeout, string expectedVersion)
+        public async Task WriteAsync(string streamName, byte[] data, TimeSpan timeout, string expectedVersion)
         {
-            await AppendAsync(streamName, data, timeout, CancellationToken.None, expectedVersion);
+            await WriteAsync(streamName, data, timeout, CancellationToken.None, expectedVersion);
         }
 
-        public async Task AppendAsync(string streamName, byte[] data, CancellationToken token, string expectedVersion)
+        public async Task WriteAsync(string streamName, byte[] data, CancellationToken token, string expectedVersion)
         {
-            await AppendAsync(streamName, data, Timeout.InfiniteTimeSpan, token, expectedVersion);
+            await WriteAsync(streamName, data, Timeout.InfiniteTimeSpan, token, expectedVersion);
         }
 
-        public async Task AppendAsync(string streamName, byte[] data, TimeSpan timeout, CancellationToken token, string expectedVersion)
+        public async Task WriteAsync(string streamName, byte[] data, TimeSpan timeout, CancellationToken token, string expectedVersion)
         {
             bool isMissing = false;
 
@@ -82,7 +82,7 @@ namespace Edit.AzureTableStorage
             if (isMissing)
             {
                 await InsertEmptyAsync(streamName, timeout, token);
-                await AppendAsync(streamName, data, timeout, token, expectedVersion);
+                await WriteAsync(streamName, data, timeout, token, expectedVersion);
             }
         }
 

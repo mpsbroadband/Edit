@@ -44,8 +44,8 @@
     <Reference Include="Edit.AzureTableStorage">
       <HintPath>Dependencies\FooFighters\Edit.AzureTableStorage\Edit.AzureTableStorage.dll</HintPath>
     </Reference>
-    <Reference Include="Edit.Protobuf">
-      <HintPath>Dependencies\FooFighters\Edit.Protobuf\Edit.Protobuf.dll</HintPath>
+    <Reference Include="Edit.JsonNet">
+      <HintPath>Dependencies\FooFighters\Edit.JsonNet\Edit.JsonNet.dll</HintPath>
     </Reference>
     <Reference Include="Machine.Specifications">
       <HintPath>Dependencies\MSpec\Machine.Specification\Machine.Specifications.dll</HintPath>
@@ -69,11 +69,11 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>Dependencies\Microsoft\WindowsAzureStorage\Microsoft.WindowsAzure.Storage.dll</HintPath>
     </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>Dependencies\JsonNet\JsonNet\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="NLog">
       <HintPath>Dependencies\NLog\NLog\NLog.dll</HintPath>
-    </Reference>
-    <Reference Include="protobuf-net">
-      <HintPath>Dependencies\Protobuf-net\Protobuf-net\protobuf-net.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -88,6 +88,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Bootstrapper.cs" />
+    <Compile Include="can_write_and_read.cs" />
     <Compile Include="when_writing_sequentially.cs" />
     <Compile Include="when_doing_concurrent_writes.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

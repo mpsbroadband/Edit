@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Edit.AzureTableStorage;
 using Edit.Protobuf;
 using Microsoft.WindowsAzure.Storage;
-using ProtoBuf;
+using Newtonsoft.Json;
 
 namespace Edit.PerformanceTests
 {
@@ -15,7 +15,7 @@ namespace Edit.PerformanceTests
     {
         private static readonly List<Guid> _ids = new List<Guid>();
 
-        const int NumberOfInsertions = 1000;
+        const int NumberOfInsertions = 10;
 
         public static void Main(string[] args)
         {
@@ -45,7 +45,7 @@ namespace Edit.PerformanceTests
             {
                 var e = new CreatedCustomer(Guid.NewGuid(), "Edit");
 
-                var task = eventStore.AppendAsync(e.Id.ToString(), new List<Chunk>()
+                var task = eventStore.WriteAsync(e.Id.ToString(), new List<Chunk>()
                     {
                         new Chunk() {Instance = e}
                     }, null);
@@ -84,20 +84,13 @@ namespace Edit.PerformanceTests
             var cloudStorageAccount = CloudStorageAccount.DevelopmentStorageAccount;
 
             var tableStore = await AzureTableStorageAppendOnlyStore.CreateAsync(cloudStorageAccount, "performancetests");
-            return StreamStore.Create(configure =>
-                {
-                    configure.WithAppendOnlyStore(tableStore);
-                    configure.WithProtobufSerialization();
-                });
+            return new StreamStore(tableStore, new JsonNetSerializer(new JsonSerializerSettings()));
         }
     }
 
-    [ProtoContract]
     public class CreatedCustomer
     {
-        [ProtoMember(1)]
         public Guid Id { get; set; }
-        [ProtoMember(2)]
         public string Name { get; set; }
 
         public CreatedCustomer()
