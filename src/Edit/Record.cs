@@ -2,8 +2,8 @@
 {
     public sealed class Record
     {
-        public byte[] Data { get; private set; }
-        public string StreamVersion { get; private set; }
+        public byte[] Data { get; set; }
+        public string StreamVersion { get; set; }
 
         public Record(byte[] data, string streamVersion)
         {

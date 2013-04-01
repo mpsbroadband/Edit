@@ -5,7 +5,7 @@ using System.Diagnostics;
 using System.Net;
 using System.Threading.Tasks;
 using Edit.AzureTableStorage;
-using Edit.Protobuf;
+using Edit.JsonNet;
 using Microsoft.WindowsAzure.Storage;
 using Newtonsoft.Json;
 
@@ -84,7 +84,7 @@ namespace Edit.PerformanceTests
             var cloudStorageAccount = CloudStorageAccount.DevelopmentStorageAccount;
 
             var tableStore = await AzureTableStorageAppendOnlyStore.CreateAsync(cloudStorageAccount, "performancetests");
-            return new StreamStore(tableStore, new JsonNetSerializer(new JsonSerializerSettings()));
+            return new StreamStore(tableStore, new JsonNetSerializer(new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.Objects}));
         }
     }
 

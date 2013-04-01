@@ -4,8 +4,8 @@ namespace Edit
 {
     public sealed class ChunkSet
     {
-        public string Version { get; private set; }
-        public IEnumerable<Chunk> Chunks { get; private set; }
+        public string Version { get; set; }
+        public IEnumerable<Chunk> Chunks { get; set; }
 
         public ChunkSet(IEnumerable<Chunk> chunks, string version)
         {

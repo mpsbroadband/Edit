@@ -1,5 +1,5 @@
 ﻿using Edit.AzureTableStorage;
-using Edit.Protobuf;
+using Edit.JsonNet;
 using Microsoft.WindowsAzure.Storage;
 using Newtonsoft.Json;
 
@@ -12,7 +12,7 @@ namespace Edit.Tests
             var cloudStorageAccount = CloudStorageAccount.DevelopmentStorageAccount;
 
             var tableStore = AzureTableStorageAppendOnlyStore.CreateAsync(cloudStorageAccount, "assumptions").Result;
-            return new StreamStore(tableStore, new JsonNetSerializer(new JsonSerializerSettings()));
+            return new StreamStore(tableStore, new JsonNetSerializer(new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.Objects }));
         }
     }
 }
