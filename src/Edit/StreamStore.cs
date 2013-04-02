@@ -4,48 +4,39 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Common.Logging;
-using Edit.Configuration;
 
 namespace Edit
 {
     public sealed class StreamStore : IStreamStore
     {
-        private readonly EventStoreSettings _settings;
+        private readonly IAppendOnlyStore _appendOnlyStore;
         private readonly Framer _framer;
         private static readonly ILog Logger = LogManager.GetCurrentClassLogger(); 
 
-        public static IStreamStore Create(Action<EventStoreConfigurator> configure)
+        public StreamStore(IAppendOnlyStore appendOnlyStore, ISerializer serializer)
         {
-            var configurator = new EventStoreConfigurator();
-            configure(configurator);
-
-            return new StreamStore(configurator.Settings);
+            _appendOnlyStore = appendOnlyStore;
+            _framer = new Framer(serializer);
         }
 
-        private StreamStore(EventStoreSettings settings)
+        #region WriteAsync
+
+        public async Task WriteAsync(string streamName, IEnumerable<Chunk> events, string expectedVersion = null)
         {
-            _settings = settings;
-            _framer = new Framer(_settings.Serializer);
+            await WriteAsync(streamName, events, Timeout.InfiniteTimeSpan, expectedVersion);
         }
 
-        #region AppendAsync
-
-        public async Task AppendAsync(string streamName, IEnumerable<Chunk> events, string expectedVersion = null)
+        public async Task WriteAsync(string streamName, IEnumerable<Chunk> events, TimeSpan timeout, string expectedVersion = null)
         {
-            await AppendAsync(streamName, events, Timeout.InfiniteTimeSpan, expectedVersion);
+            await WriteAsync(streamName, events, timeout, CancellationToken.None, expectedVersion);
         }
 
-        public async Task AppendAsync(string streamName, IEnumerable<Chunk> events, TimeSpan timeout, string expectedVersion = null)
+        public async Task WriteAsync(string streamName, IEnumerable<Chunk> events, CancellationToken token, string expectedVersion = null)
         {
-            await AppendAsync(streamName, events, timeout, CancellationToken.None, expectedVersion);
+            await WriteAsync(streamName, events, Timeout.InfiniteTimeSpan, token, expectedVersion);
         }
 
-        public async Task AppendAsync(string streamName, IEnumerable<Chunk> events, CancellationToken token, string expectedVersion = null)
-        {
-            await AppendAsync(streamName, events, Timeout.InfiniteTimeSpan, token, expectedVersion);
-        }
-
-        public async Task AppendAsync(string streamName, IEnumerable<Chunk> events, TimeSpan timeout, CancellationToken token, string expectedVersion = null)
+        public async Task WriteAsync(string streamName, IEnumerable<Chunk> events, TimeSpan timeout, CancellationToken token, string expectedVersion = null)
         {
             byte[] data;
 
@@ -60,7 +51,7 @@ namespace Edit
                 data = memoryStream.ToArray();
             }
 
-            await _settings.AppendOnlyStore.AppendAsync(streamName, data, timeout, token, expectedVersion);
+            await _appendOnlyStore.WriteAsync(streamName, data, timeout, token, expectedVersion);
         }
 
         #endregion
@@ -86,7 +77,7 @@ namespace Edit
         public async Task<ChunkSet> ReadAsync(string streamName, TimeSpan timeout, CancellationToken token)
         {
             Logger.DebugFormat("BEGIN: Read async from the append only store. Streamname : '{0}'", streamName);
-            var record = await _settings.AppendOnlyStore.ReadAsync(streamName, timeout, token);
+            var record = await _appendOnlyStore.ReadAsync(streamName, timeout, token);
             Logger.DebugFormat("END: Read async from the append only store. Streamname : '{0}'", streamName);
 
             using (var memoryStream = new MemoryStream(record.Data))

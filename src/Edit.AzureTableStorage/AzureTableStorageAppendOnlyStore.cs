@@ -9,9 +9,9 @@ namespace Edit.AzureTableStorage
 {
     public sealed class AzureTableStorageAppendOnlyStore : IAppendOnlyStore
     {
-        private CloudTableClient _cloudTableClient;
-        private CloudTable _cloudTable;
         private static readonly ILog Logger = LogManager.GetCurrentClassLogger();
+        private CloudStorageAccount _cloudStorageAccount;
+        private string _tableName;
 
         private const string RowKey = "0";
 
@@ -24,38 +24,44 @@ namespace Edit.AzureTableStorage
 
         private async Task StartAsync(CloudStorageAccount cloudStorageAccount, string tableName)
         {
-            _cloudTableClient = cloudStorageAccount.CreateCloudTableClient();
-            _cloudTable = _cloudTableClient.GetTableReference(tableName);
+            _cloudStorageAccount = cloudStorageAccount;
+            _tableName = tableName;
+
+            CloudTableClient cloudTableClient = cloudStorageAccount.CreateCloudTableClient();
+            CloudTable cloudTable = cloudTableClient.GetTableReference(tableName);
 
             // create container if it does not exist on startup
-            await _cloudTable.CreateIfNotExistAsync();
+            await cloudTable.CreateIfNotExistAsync();
         }
 
-        #region AppendAsync
+        #region WriteAsync
 
-        public async Task AppendAsync(string streamName, byte[] data, string expectedVersion)
+        public async Task WriteAsync(string streamName, byte[] data, string expectedVersion)
         {
-            await AppendAsync(streamName, data, Timeout.InfiniteTimeSpan, expectedVersion);
+            await WriteAsync(streamName, data, Timeout.InfiniteTimeSpan, expectedVersion);
         }
 
-        public async Task AppendAsync(string streamName, byte[] data, TimeSpan timeout, string expectedVersion)
+        public async Task WriteAsync(string streamName, byte[] data, TimeSpan timeout, string expectedVersion)
         {
-            await AppendAsync(streamName, data, timeout, CancellationToken.None, expectedVersion);
+            await WriteAsync(streamName, data, timeout, CancellationToken.None, expectedVersion);
         }
 
-        public async Task AppendAsync(string streamName, byte[] data, CancellationToken token, string expectedVersion)
+        public async Task WriteAsync(string streamName, byte[] data, CancellationToken token, string expectedVersion)
         {
-            await AppendAsync(streamName, data, Timeout.InfiniteTimeSpan, token, expectedVersion);
+            await WriteAsync(streamName, data, Timeout.InfiniteTimeSpan, token, expectedVersion);
         }
 
-        public async Task AppendAsync(string streamName, byte[] data, TimeSpan timeout, CancellationToken token, string expectedVersion)
+        public async Task WriteAsync(string streamName, byte[] data, TimeSpan timeout, CancellationToken token, string expectedVersion)
         {
+            var cloudTableClient = _cloudStorageAccount.CreateCloudTableClient();
+            var cloudTable = cloudTableClient.GetTableReference(_tableName);
+
             bool isMissing = false;
 
             try
             {
                 await
-                    _cloudTable.ReplaceAsync(new AppendOnlyStoreTableEntity
+                    cloudTable.ReplaceAsync(new AppendOnlyStoreTableEntity
                     {
                         PartitionKey = streamName,
                         RowKey = RowKey,
@@ -65,7 +71,7 @@ namespace Edit.AzureTableStorage
             }
             catch (StorageException e)
             {
-                if (e.RequestInformation.HttpStatusCode == 409) // 409 == Conflict
+                if (e.RequestInformation.HttpStatusCode == 409 || e.RequestInformation.HttpStatusCode == 412) // 409 == Conflict
                 {
                     throw new ConcurrencyException(streamName, expectedVersion);
                 }
@@ -82,7 +88,7 @@ namespace Edit.AzureTableStorage
             if (isMissing)
             {
                 await InsertEmptyAsync(streamName, timeout, token);
-                await AppendAsync(streamName, data, timeout, token, expectedVersion);
+                await WriteAsync(streamName, data, timeout, token, expectedVersion);
             }
         }
 
@@ -107,12 +113,15 @@ namespace Edit.AzureTableStorage
 
         public async Task<Record> ReadAsync(string streamName, TimeSpan timeout, CancellationToken token)
         {
+            var cloudTableClient = _cloudStorageAccount.CreateCloudTableClient();
+            var cloudTable = cloudTableClient.GetTableReference(_tableName);
+
             bool isMissing = false;
 
             try
             {
                 Logger.DebugFormat("BEGIN: Retrieve cloud table entity async id: '{0}', thread: '{1}'", streamName, Thread.CurrentThread.ManagedThreadId);
-                var entity = await _cloudTable.RetrieveAsync<AppendOnlyStoreTableEntity>(streamName, RowKey);
+                var entity = await cloudTable.RetrieveAsync<AppendOnlyStoreTableEntity>(streamName, RowKey);
                 Logger.DebugFormat("END: Retrieve cloud table entity async id: '{0}', thread: '{1}'", streamName, Thread.CurrentThread.ManagedThreadId);
 
                 if (entity == null)
@@ -149,6 +158,9 @@ namespace Edit.AzureTableStorage
 
         private async Task InsertEmptyAsync(string streamName, TimeSpan timeout, CancellationToken token)
         {
+            var cloudTableClient = _cloudStorageAccount.CreateCloudTableClient();
+            var cloudTable = cloudTableClient.GetTableReference(_tableName);
+
             var entity = new AppendOnlyStoreTableEntity()
             {
                 ETag = "*",
@@ -159,7 +171,7 @@ namespace Edit.AzureTableStorage
 
             try
             {
-                await _cloudTable.InsertAsync(entity);
+                await cloudTable.InsertAsync(entity);
             }
             catch (Exception ex)
             {
