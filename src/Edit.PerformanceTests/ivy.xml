@@ -6,6 +6,6 @@
   <dependencies>
     <dependency org="FooFighters" name="Edit" rev="latest.integration" />
 	<dependency org="FooFighters" name="Edit.AzureTableStorage" rev="latest.integration" />
-	<dependency org="FooFighters" name="Edit.Protobuf" rev="latest.integration" />
+	<dependency org="FooFighters" name="Edit.JsonNet" rev="latest.integration" />
   </dependencies>  
 </ivy-module>
