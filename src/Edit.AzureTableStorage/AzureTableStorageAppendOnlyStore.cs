@@ -148,9 +148,11 @@ namespace Edit.AzureTableStorage
 
             if (isMissing)
             {
-                Logger.DebugFormat("BEGIN: Insert empty async: StreamName: '{0}'", streamName);
-                await InsertEmptyAsync(streamName, timeout, token);
-                Logger.DebugFormat("END: Insert empty async: StreamName: '{0}'", streamName);
+                //Logger.DebugFormat("BEGIN: Insert empty async: StreamName: '{0}'", streamName);
+                //await InsertEmptyAsync(streamName, timeout, token);
+                Logger.DebugFormat("Returning null");
+                return null;
+                //Logger.DebugFormat("END: Insert empty async: StreamName: '{0}'", streamName);
             }
 
             return await ReadAsync(streamName, timeout, token);

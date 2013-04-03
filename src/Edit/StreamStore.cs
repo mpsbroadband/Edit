@@ -79,6 +79,12 @@ namespace Edit
             Logger.DebugFormat("BEGIN: Read async from the append only store. Streamname : '{0}'", streamName);
             var record = await _appendOnlyStore.ReadAsync(streamName, timeout, token);
             Logger.DebugFormat("END: Read async from the append only store. Streamname : '{0}'", streamName);
+            
+            if (record == null)
+            {
+                Logger.DebugFormat("Got a null response. Returning null.");
+                return null;
+            }
 
             using (var memoryStream = new MemoryStream(record.Data))
             {
