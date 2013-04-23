@@ -38,8 +38,33 @@
     <Reference Include="Common.Logging.NLog20">
       <HintPath>Dependencies\Common.Logging\Common.Logging\Common.Logging.NLog20.dll</HintPath>
     </Reference>
+    <Reference Include="CommonDomainLibrary">
+      <HintPath>..\..\..\Security\src\Security.Domain.Tests\Dependencies\FooFighters\CommonDomainLibrary\CommonDomainLibrary.dll</HintPath>
+    </Reference>
+    <Reference Include="CommonTestingFramework">
+      <HintPath>..\..\..\Security\src\Security.Domain.Tests\Dependencies\FooFighters\CommonTestingFramework\CommonTestingFramework.dll</HintPath>
+    </Reference>
     <Reference Include="Edit">
       <HintPath>Dependencies\FooFighters\Edit\Edit.dll</HintPath>
+    </Reference>
+    <Reference Include="Edit.AzureTableStorage, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\Security\src\Security.Domain.Tests\Dependencies\FooFighters\Edit.AzureTableStorage\Edit.AzureTableStorage.dll</HintPath>
+    </Reference>
+    <Reference Include="Edit.JsonNet">
+      <HintPath>..\..\..\Security\src\Security.Domain.Tests\Dependencies\FooFighters\Edit.JsonNet\Edit.JsonNet.dll</HintPath>
+    </Reference>
+    <Reference Include="EventStore">
+      <HintPath>..\..\..\Security\src\Security.Domain.Tests\Dependencies\FooFighters\EventStore\EventStore.dll</HintPath>
+    </Reference>
+    <Reference Include="FakeItEasy">
+      <HintPath>..\..\..\Security\src\Security.Domain.Tests\Dependencies\FakeItEasy\FakeItEasy\FakeItEasy.dll</HintPath>
+    </Reference>
+    <Reference Include="Machine.Specifications">
+      <HintPath>..\..\..\Security\src\Security.Domain.Tests\Dependencies\MSpec\Machine.Specification\Machine.Specifications.dll</HintPath>
+    </Reference>
+    <Reference Include="Machine.Specifications.Clr4">
+      <HintPath>..\..\..\Security\src\Security.Domain.Tests\Dependencies\MSpec\Machine.Specification\Machine.Specifications.Clr4.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Data.Edm, Version=5.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -57,8 +82,20 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>Dependencies\Microsoft\WindowsAzureStorage\Microsoft.WindowsAzure.Storage.dll</HintPath>
     </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\..\..\Security\src\Security.Domain.Tests\Dependencies\JsonNet\JsonNet\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="NLog">
       <HintPath>Dependencies\NLog\NLog\NLog.dll</HintPath>
+    </Reference>
+    <Reference Include="NodaTime">
+      <HintPath>..\..\..\Security\src\Security.Domain.Tests\Dependencies\NodaTime\NodaTime\NodaTime.dll</HintPath>
+    </Reference>
+    <Reference Include="Security.Contracts">
+      <HintPath>..\..\..\Security\src\Security.Domain.Tests\Dependencies\FooFighters\Security.Contracts\Security.Contracts.dll</HintPath>
+    </Reference>
+    <Reference Include="Security.Domain">
+      <HintPath>..\..\..\Security\src\Security.Domain.Tests\Dependencies\FooFighters\Security.Domain\Security.Domain.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
