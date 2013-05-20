@@ -38,8 +38,8 @@ namespace Edit.Tests
         private It should_have_an_precondition_failed_exception = () =>
             {
                 var aggregateException = exception as AggregateException;
-                var innerException = aggregateException.InnerExceptions.First() as StorageException;
-                innerException.RequestInformation.HttpStatusCode.ShouldEqual(412);
+                var innerException = aggregateException.InnerExceptions.FirstOrDefault() as ConcurrencyException;
+                innerException.ShouldNotBeNull();
             };
 
         protected static IStreamStore eventStore;
