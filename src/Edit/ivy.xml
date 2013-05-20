@@ -7,6 +7,7 @@
   </publications>
   <dependencies>
     <dependency org="Common.Logging" name="Common.Logging" rev="2.1+" />  
-	<dependency org="NLog" name="NLog" rev="2.0+" />  
+	<dependency org="NLog" name="NLog" rev="2.0+" />
+	<dependency org="Microsoft" name="DataServicesClient" rev="5.4+" />
   </dependencies>  
 </ivy-module>
