@@ -53,6 +53,8 @@
     <Compile Include="Chunk.cs" />
     <Compile Include="ChunkSet.cs" />
     <Compile Include="ConcurrencyException.cs" />
+    <Compile Include="IFramer.cs" />
+    <Compile Include="IStoredDataVersion.cs" />
     <Compile Include="StreamStore.cs" />
     <Compile Include="Framer.cs" />
     <Compile Include="IStreamStore.cs" />

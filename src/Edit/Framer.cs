@@ -5,7 +5,7 @@ using System.Security.Cryptography;
 
 namespace Edit
 {
-    public class Framer
+    public class Framer : IFramer
     {
         private readonly ISerializer _serializer;
         private readonly SHA1Managed _sha1Managed = new SHA1Managed();

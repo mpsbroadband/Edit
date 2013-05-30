@@ -77,6 +77,7 @@
   <ItemGroup>
     <Compile Include="AppendOnlyStoreTableEntity.cs" />
     <Compile Include="AzureTableStorageAppendOnlyStore.cs" />
+    <Compile Include="AzureTableStorageEntryDataVersion.cs" />
     <Compile Include="CloudTableExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -4,10 +4,10 @@ namespace Edit
 {
     public sealed class ChunkSet
     {
-        public string Version { get; set; }
+        public IStoredDataVersion Version { get; set; }
         public IEnumerable<Chunk> Chunks { get; set; }
 
-        public ChunkSet(IEnumerable<Chunk> chunks, string version)
+        public ChunkSet(IEnumerable<Chunk> chunks, IStoredDataVersion version)
         {
             Chunks = new List<Chunk>(chunks);
             Version = version;

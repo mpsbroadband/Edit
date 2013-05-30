@@ -3,9 +3,9 @@
     public sealed class Record
     {
         public byte[] Data { get; set; }
-        public string StreamVersion { get; set; }
+        public IStoredDataVersion StreamVersion { get; set; }
 
-        public Record(byte[] data, string streamVersion)
+        public Record(byte[] data, IStoredDataVersion streamVersion)
         {
             Data = data;
             StreamVersion = streamVersion;

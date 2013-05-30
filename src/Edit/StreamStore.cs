@@ -21,22 +21,22 @@ namespace Edit
 
         #region WriteAsync
 
-        public async Task WriteAsync(string streamName, IEnumerable<Chunk> events, string expectedVersion = null)
+        public async Task WriteAsync(string streamName, IEnumerable<Chunk> events, IStoredDataVersion expectedVersion = null)
         {
             await WriteAsync(streamName, events, Timeout.InfiniteTimeSpan, expectedVersion);
         }
 
-        public async Task WriteAsync(string streamName, IEnumerable<Chunk> events, TimeSpan timeout, string expectedVersion = null)
+        public async Task WriteAsync(string streamName, IEnumerable<Chunk> events, TimeSpan timeout, IStoredDataVersion expectedVersion = null)
         {
             await WriteAsync(streamName, events, timeout, CancellationToken.None, expectedVersion);
         }
 
-        public async Task WriteAsync(string streamName, IEnumerable<Chunk> events, CancellationToken token, string expectedVersion = null)
+        public async Task WriteAsync(string streamName, IEnumerable<Chunk> events, CancellationToken token, IStoredDataVersion expectedVersion = null)
         {
             await WriteAsync(streamName, events, Timeout.InfiniteTimeSpan, token, expectedVersion);
         }
 
-        public async Task WriteAsync(string streamName, IEnumerable<Chunk> events, TimeSpan timeout, CancellationToken token, string expectedVersion = null)
+        public async Task WriteAsync(string streamName, IEnumerable<Chunk> events, TimeSpan timeout, CancellationToken token, IStoredDataVersion expectedVersion = null)
         {
             byte[] data;
 

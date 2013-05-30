@@ -36,25 +36,39 @@ namespace Edit.AzureTableStorage
 
         #region WriteAsync
 
-        public async Task WriteAsync(string streamName, byte[] data, string expectedVersion)
+        public async Task WriteAsync(string streamName, byte[] data, IStoredDataVersion expectedVersion)
         {
             await WriteAsync(streamName, data, Timeout.InfiniteTimeSpan, expectedVersion);
         }
 
-        public async Task WriteAsync(string streamName, byte[] data, TimeSpan timeout, string expectedVersion)
+        public async Task WriteAsync(string streamName, byte[] data, TimeSpan timeout, IStoredDataVersion expectedVersion)
         {
             await WriteAsync(streamName, data, timeout, CancellationToken.None, expectedVersion);
         }
 
-        public async Task WriteAsync(string streamName, byte[] data, CancellationToken token, string expectedVersion)
+        public async Task WriteAsync(string streamName, byte[] data, CancellationToken token, IStoredDataVersion expectedVersion)
         {
             await WriteAsync(streamName, data, Timeout.InfiniteTimeSpan, token, expectedVersion);
         }
 
-        public async Task WriteAsync(string streamName, byte[] data, TimeSpan timeout, CancellationToken token, string expectedVersion)
+        public async Task WriteAsync(string streamName, byte[] data, TimeSpan timeout, CancellationToken token, IStoredDataVersion expectedVersion)
         {
             var cloudTableClient = _cloudStorageAccount.CreateCloudTableClient();
             var cloudTable = cloudTableClient.GetTableReference(_tableName);
+
+            String version = null;
+            if (expectedVersion != null)
+            {
+                var azureDataVersion = expectedVersion as AzureTableStorageEntryDataVersion;
+                if (azureDataVersion == null)
+                {
+                    throw new ConcurrencyException(streamName, expectedVersion);
+                }
+                else
+                {
+                    version = azureDataVersion.Version;
+                }
+            }
 
             bool isMissing = false;
 
@@ -66,7 +80,7 @@ namespace Edit.AzureTableStorage
                         PartitionKey = streamName,
                         RowKey = RowKey,
                         Data = data,
-                        ETag = expectedVersion ?? "*" // "*" means that it will overwrite it and discard optimistic concurrency
+                        ETag = version ?? "*" // "*" means that it will overwrite it and discard optimistic concurrency
                     });
             }
             catch (StorageException e)
@@ -131,7 +145,7 @@ namespace Edit.AzureTableStorage
                 }
                 else
                 {
-                    return new Record(entity.Data, entity.ETag);
+                    return new Record(entity.Data, new AzureTableStorageEntryDataVersion { Version = entity.ETag, LastRowKey = "0", IdOfFirstDataInLastRow = null } );
                 }                
             }
             catch (StorageException exception)
