@@ -53,15 +53,10 @@
     <Compile Include="Chunk.cs" />
     <Compile Include="ChunkSet.cs" />
     <Compile Include="ConcurrencyException.cs" />
-    <Compile Include="IFramer.cs" />
     <Compile Include="IStoredDataVersion.cs" />
-    <Compile Include="StreamStore.cs" />
-    <Compile Include="Framer.cs" />
     <Compile Include="IStreamStore.cs" />
     <Compile Include="ISerializer.cs" />
-    <Compile Include="IAppendOnlyStore.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Record.cs" />
     <Compile Include="TaskExtensions.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

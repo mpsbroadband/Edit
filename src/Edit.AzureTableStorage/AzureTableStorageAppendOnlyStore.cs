@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Common.Logging;
@@ -7,17 +9,25 @@ using Microsoft.WindowsAzure.Storage.Table;
 
 namespace Edit.AzureTableStorage
 {
-    public sealed class AzureTableStorageAppendOnlyStore : IAppendOnlyStore
+    public sealed class AzureTableStorageAppendOnlyStore : IStreamStore, IDisposable
     {
         private static readonly ILog Logger = LogManager.GetCurrentClassLogger();
         private CloudStorageAccount _cloudStorageAccount;
         private string _tableName;
+        private readonly IFramer _framer;
+
+        public const int MaxColumnSize = 65355;
+
+        public AzureTableStorageAppendOnlyStore(IFramer framer)
+        {
+            _framer = framer;
+        }
 
         private const string RowKey = "0";
 
-        public static async Task<IAppendOnlyStore> CreateAsync(CloudStorageAccount cloudStorageAccount, string tableName)
+        public static async Task<IStreamStore> CreateAsync(CloudStorageAccount cloudStorageAccount, string tableName, ISerializer serializer)
         {
-            var streamStore = new AzureTableStorageAppendOnlyStore();
+            var streamStore = new AzureTableStorageAppendOnlyStore(new AzureTableStorageFramer(serializer));
             await streamStore.StartAsync(cloudStorageAccount, tableName);
             return streamStore;
         }
@@ -36,25 +46,27 @@ namespace Edit.AzureTableStorage
 
         #region WriteAsync
 
-        public async Task WriteAsync(string streamName, byte[] data, IStoredDataVersion expectedVersion)
+        public async Task WriteAsync(string streamName, IEnumerable<Chunk> chunks, IStoredDataVersion expectedVersion)
         {
-            await WriteAsync(streamName, data, Timeout.InfiniteTimeSpan, expectedVersion);
+            await WriteAsync(streamName, chunks, Timeout.InfiniteTimeSpan, expectedVersion);
         }
 
-        public async Task WriteAsync(string streamName, byte[] data, TimeSpan timeout, IStoredDataVersion expectedVersion)
+        public async Task WriteAsync(string streamName, IEnumerable<Chunk> chunks, TimeSpan timeout, IStoredDataVersion expectedVersion)
         {
-            await WriteAsync(streamName, data, timeout, CancellationToken.None, expectedVersion);
+            await WriteAsync(streamName, chunks, timeout, CancellationToken.None, expectedVersion);
         }
 
-        public async Task WriteAsync(string streamName, byte[] data, CancellationToken token, IStoredDataVersion expectedVersion)
+        public async Task WriteAsync(string streamName, IEnumerable<Chunk> chunks, CancellationToken token, IStoredDataVersion expectedVersion)
         {
-            await WriteAsync(streamName, data, Timeout.InfiniteTimeSpan, token, expectedVersion);
+            await WriteAsync(streamName, chunks, Timeout.InfiniteTimeSpan, token, expectedVersion);
         }
 
-        public async Task WriteAsync(string streamName, byte[] data, TimeSpan timeout, CancellationToken token, IStoredDataVersion expectedVersion)
+        public Task WriteAsync(string streamName, IEnumerable<Chunk> chunks, TimeSpan timeout,
+                                     CancellationToken token, IStoredDataVersion expectedVersion)
         {
-            var cloudTableClient = _cloudStorageAccount.CreateCloudTableClient();
-            var cloudTable = cloudTableClient.GetTableReference(_tableName);
+            var entity = _framer.Write(chunks);
+            entity.PartitionKey = streamName;
+            entity.RowKey = RowKey;
 
             String version = null;
             if (expectedVersion != null)
@@ -64,24 +76,23 @@ namespace Edit.AzureTableStorage
                 {
                     throw new ConcurrencyException(streamName, expectedVersion);
                 }
-                else
-                {
-                    version = azureDataVersion.Version;
-                }
+                version = azureDataVersion.Version;
             }
+            entity.ETag = version ?? "*"; // "*" means that it will overwrite it and discard optimistic concurrency
+
+            return WriteAsync(streamName, entity, timeout, token, expectedVersion);
+        }
+
+        private async Task WriteAsync(string streamName, AppendOnlyStoreTableEntity entity, TimeSpan timeout, CancellationToken token, IStoredDataVersion expectedVersion)
+        {
+            var cloudTableClient = _cloudStorageAccount.CreateCloudTableClient();
+            var cloudTable = cloudTableClient.GetTableReference(_tableName);
 
             bool isMissing = false;
 
             try
             {
-                await
-                    cloudTable.ReplaceAsync(new AppendOnlyStoreTableEntity
-                    {
-                        PartitionKey = streamName,
-                        RowKey = RowKey,
-                        Data = data,
-                        ETag = version ?? "*" // "*" means that it will overwrite it and discard optimistic concurrency
-                    });
+                await cloudTable.ReplaceAsync(entity);
             }
             catch (StorageException e)
             {
@@ -102,7 +113,7 @@ namespace Edit.AzureTableStorage
             if (isMissing)
             {
                 await InsertEmptyAsync(streamName, timeout, token);
-                await WriteAsync(streamName, data, timeout, token, expectedVersion);
+                await WriteAsync(streamName, entity, timeout, token, expectedVersion);
             }
         }
 
@@ -110,22 +121,22 @@ namespace Edit.AzureTableStorage
 
         #region ReadAsync
 
-        public async Task<Record> ReadAsync(string streamName)
+        public async Task<ChunkSet> ReadAsync(string streamName)
         {
             return await ReadAsync(streamName, Timeout.InfiniteTimeSpan);
         }
 
-        public async Task<Record> ReadAsync(string streamName, TimeSpan timeout)
+        public async Task<ChunkSet> ReadAsync(string streamName, TimeSpan timeout)
         {
             return await ReadAsync(streamName, timeout, CancellationToken.None);
         }
 
-        public async Task<Record> ReadAsync(string streamName, CancellationToken token)
+        public async Task<ChunkSet> ReadAsync(string streamName, CancellationToken token)
         {
             return await ReadAsync(streamName, Timeout.InfiniteTimeSpan, token);
         }
 
-        public async Task<Record> ReadAsync(string streamName, TimeSpan timeout, CancellationToken token)
+        public async Task<ChunkSet> ReadAsync(string streamName, TimeSpan timeout, CancellationToken token)
         {
             var cloudTableClient = _cloudStorageAccount.CreateCloudTableClient();
             var cloudTable = cloudTableClient.GetTableReference(_tableName);
@@ -145,8 +156,9 @@ namespace Edit.AzureTableStorage
                 }
                 else
                 {
-                    return new Record(entity.Data, new AzureTableStorageEntryDataVersion { Version = entity.ETag, LastRowKey = "0", IdOfFirstDataInLastRow = null } );
-                }                
+                    var chunks = _framer.Read<Chunk>(entity);
+                    return new ChunkSet(chunks, new AzureTableStorageEntryDataVersion { Version = entity.ETag, LastRowKey = "0", IdOfFirstDataInLastRow = null });
+                }
             }
             catch (StorageException exception)
             {

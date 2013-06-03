@@ -18,19 +18,19 @@ namespace Edit.AzureTableStorage
         public byte[] Data11 { get; set; }
         public byte[] Data12 { get; set; }
         public byte[] Data13 { get; set; }
-        public Guid?[] IdsInData { get; set; }
-        public Guid?[] IdsInData2 { get; set; }
-        public Guid?[] IdsInData3 { get; set; }
-        public Guid?[] IdsInData4 { get; set; }
-        public Guid?[] IdsInData5 { get; set; }
-        public Guid?[] IdsInData6 { get; set; }
-        public Guid?[] IdsInData7 { get; set; }
-        public Guid?[] IdsInData8 { get; set; }
-        public Guid?[] IdsInData9 { get; set; }
-        public Guid?[] IdsInData10 { get; set; }
-        public Guid?[] IdsInData11 { get; set; }
-        public Guid?[] IdsInData12 { get; set; }
-        public Guid?[] IdsInData13 { get; set; }
+        public int NoChunksInData { get; set; }
+        public int NoChunksInData2 { get; set; }
+        public int NoChunksInData3 { get; set; }
+        public int NoChunksInData4 { get; set; }
+        public int NoChunksInData5 { get; set; }
+        public int NoChunksInData6 { get; set; }
+        public int NoChunksInData7 { get; set; }
+        public int NoChunksInData8 { get; set; }
+        public int NoChunksInData9 { get; set; }
+        public int NoChunksInData10 { get; set; }
+        public int NoChunksInData11 { get; set; }
+        public int NoChunksInData12 { get; set; }
+        public int NoChunksInData13 { get; set; }
         public bool IsFull { get; set; }
     }
 }

@@ -38,9 +38,6 @@
     <Reference Include="Common.Logging.NLog20">
       <HintPath>Dependencies\Common.Logging\Common.Logging\Common.Logging.NLog20.dll</HintPath>
     </Reference>
-    <Reference Include="Edit">
-      <HintPath>Dependencies\FooFighters\Edit\Edit.dll</HintPath>
-    </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>Dependencies\JsonNet\JsonNet\Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -53,6 +50,15 @@
   <ItemGroup>
     <Compile Include="JsonNetSerializer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Edit\Edit.csproj">
+      <Project>{7328156f-f56e-4970-b50f-ac61920f171b}</Project>
+      <Name>Edit</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

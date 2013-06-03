@@ -83,8 +83,7 @@ namespace Edit.PerformanceTests
         {
             var cloudStorageAccount = CloudStorageAccount.DevelopmentStorageAccount;
 
-            var tableStore = await AzureTableStorageAppendOnlyStore.CreateAsync(cloudStorageAccount, "performancetests");
-            return new StreamStore(tableStore, new JsonNetSerializer(new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.Objects}));
+            return await AzureTableStorageAppendOnlyStore.CreateAsync(cloudStorageAccount, "performancetests", new JsonNetSerializer(new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.Objects }));
         }
     }
 

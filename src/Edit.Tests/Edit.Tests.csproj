@@ -38,15 +38,6 @@
     <Reference Include="Common.Logging.NLog20">
       <HintPath>Dependencies\Common.Logging\Common.Logging\Common.Logging.NLog20.dll</HintPath>
     </Reference>
-    <Reference Include="Edit">
-      <HintPath>Dependencies\FooFighters\Edit\Edit.dll</HintPath>
-    </Reference>
-    <Reference Include="Edit.AzureTableStorage">
-      <HintPath>Dependencies\FooFighters\Edit.AzureTableStorage\Edit.AzureTableStorage.dll</HintPath>
-    </Reference>
-    <Reference Include="Edit.JsonNet">
-      <HintPath>Dependencies\FooFighters\Edit.JsonNet\Edit.JsonNet.dll</HintPath>
-    </Reference>
     <Reference Include="Machine.Specifications">
       <HintPath>Dependencies\MSpec\Machine.Specification\Machine.Specifications.dll</HintPath>
     </Reference>
@@ -98,6 +89,20 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Edit.AzureTableStorage\Edit.AzureTableStorage.csproj">
+      <Project>{8829a41b-c0b5-45b1-8119-406b7da74ecf}</Project>
+      <Name>Edit.AzureTableStorage</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Edit.JsonNet\Edit.JsonNet.csproj">
+      <Project>{05987028-7355-4324-9cc8-dca8a6fd81db}</Project>
+      <Name>Edit.JsonNet</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Edit\Edit.csproj">
+      <Project>{7328156f-f56e-4970-b50f-ac61920f171b}</Project>
+      <Name>Edit</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
