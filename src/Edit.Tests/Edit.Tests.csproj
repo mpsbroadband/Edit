@@ -83,6 +83,9 @@
   <ItemGroup>
     <Compile Include="Bootstrapper.cs" />
     <Compile Include="can_write_and_read.cs" />
+    <Compile Include="when_writing_a_lot_of_messages_with_total_size_greater_than_64KB.cs" />
+    <Compile Include="when_writing_a_single_message_larger_than_64KB.cs" />
+    <Compile Include="when_writing_multiple_messages.cs" />
     <Compile Include="when_writing_sequentially.cs" />
     <Compile Include="when_doing_concurrent_writes.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

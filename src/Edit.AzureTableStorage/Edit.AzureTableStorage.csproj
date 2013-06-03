@@ -76,8 +76,11 @@
     <Compile Include="AzureTableStorageAppendOnlyStore.cs" />
     <Compile Include="AzureTableStorageEntryDataVersion.cs" />
     <Compile Include="AzureTableStorageFramer.cs" />
+    <Compile Include="ChunkSerializer.cs" />
     <Compile Include="CloudTableExtensions.cs" />
     <Compile Include="ColumnsWrapper.cs" />
+    <Compile Include="DataColumn.cs" />
+    <Compile Include="DataRow.cs" />
     <Compile Include="IFramer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

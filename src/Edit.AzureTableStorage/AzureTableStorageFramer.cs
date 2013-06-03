@@ -10,82 +10,14 @@ namespace Edit.AzureTableStorage
 {
     public class AzureTableStorageFramer : IFramer
     {
-        private readonly ISerializer _serializer;
-        private readonly SHA1Managed _sha1Managed = new SHA1Managed();
+        private readonly ChunkSerializer _serializer;
 
         public AzureTableStorageFramer(ISerializer serializer)
         {
-            _serializer = serializer;
+            _serializer = new ChunkSerializer(serializer);
         }
 
-        public byte[] Write<T>(T frame) where T : class
-        {
-            byte[] eSerialized;
-
-            using (var memoryStream = new MemoryStream())
-            {
-                _serializer.Serialize(frame, memoryStream);
-                eSerialized = memoryStream.ToArray();
-            }
-
-            using (var memoryStream = new MemoryStream())
-            {
-                using (var binary = new BinaryWriter(memoryStream))
-                {
-                    binary.Write(eSerialized.Length); // length of data in int
-                    binary.Write(eSerialized); // the actual data
-
-                    var data = new byte[memoryStream.Position];
-                    memoryStream.Seek(0, SeekOrigin.Begin); //rewind stream
-                    memoryStream.ReadAsync(data, 0, data.Length); // read to data
-
-                    var hash = ComputeHash(data);
-                    binary.Write(hash); // write hash to stream
-
-                    return memoryStream.ToArray();
-                }
-            }
-        }
-
-        private IEnumerable<T> Read<T>(byte[] dataFrames) where T : class
-        {
-            using (var source = new MemoryStream(dataFrames))
-            {
-                var frames = new List<T>();
-                var binary = new BinaryReader(source);
-
-                source.Seek(0, SeekOrigin.Begin); // make sure the stream is at position 0
-
-                while (source.Length > source.Position)
-                {
-                    var length = binary.ReadInt32();
-                    var bytes = binary.ReadBytes(length);
-
-                    var data = new byte[source.Position];
-                    source.Seek(0, SeekOrigin.Begin);
-                    source.ReadAsync(data, 0, data.Length);
-
-                    var actualHash = ComputeHash(data);
-
-                    var hash = binary.ReadBytes(20);
-
-                    if (!hash.SequenceEqual(actualHash))
-                    {
-                        // This is broken, but it doesn't really matter. 
-                        // Shall we log it ?
-                    }
-                    using (var memoryStream = new MemoryStream(bytes))
-                    {
-                        var e = _serializer.Deserialize<T>(memoryStream);
-                        frames.Add(e);
-                    }
-                }
-
-                return frames;
-            }
-        }
-
-        private IEnumerable<T> ReadColumns<T>(IEnumerable<Func<byte[]>> columns) where T : class
+        private IEnumerable<T> ReadColumns<T>(IEnumerable<DataColumn> columns) where T : class
         {
             var frames = new List<T>();
             foreach (var column in columns)
@@ -105,12 +37,12 @@ namespace Edit.AzureTableStorage
             return frames;
         }
 
-        private IEnumerable<T> ReadColumn<T>(Func<byte[]> column) where T : class
+        private IEnumerable<T> ReadColumn<T>(DataColumn column) where T : class
         {
-            byte[] data = column();
+            byte[] data = column.Get();
             if (data != null)
             {
-                return Read<T>(data);
+                return _serializer.Read<T>(data);
             }
             return Enumerable.Empty<T>();
         }
@@ -123,28 +55,57 @@ namespace Edit.AzureTableStorage
 
         public AppendOnlyStoreTableEntity Write<T>(IEnumerable<T> frames) where T : class
         {
-            byte[] data;
+            var entity = new AppendOnlyStoreTableEntity();
+            var columns = new ColumnsWrapper(entity).DataColumns.GetEnumerator();
+            var memoryStream = new MemoryStream();
 
-            using (var memoryStream = new MemoryStream())
+            try
             {
+                int currSize = 0;
+                int noChunksInColumn = 0;
+                columns.MoveNext();
+                DataColumn column = columns.Current;
                 foreach (var frame in frames)
                 {
-                    var result = Write(frame);
+                    var result = _serializer.Write(frame);
+                    int resultSize = result.Length;
+                    if (resultSize > DataColumn.MaxSize)
+                        // Cannot handle single message being larger than one column. Could be fixed by allowing a message to expand to multiple columns and rows
+                    {
+                        throw new StorageSizeException("Messages larger than " + DataColumn.MaxSize +
+                                                       " bytes is not supported");
+                    }
+                    currSize += resultSize;
+                    if (currSize > DataColumn.MaxSize)
+                    {
+                        column.Set(memoryStream.ToArray());
+                        column.SetNumberOfChunks(noChunksInColumn);
+                        if (!columns.MoveNext())
+                        {
+                            throw new StorageSizeException(
+                                "Aggregates larger than one row is not supported yet. Multi row support is coming.");
+                        }
+                        column = columns.Current;
+                        memoryStream.Dispose();
+                        memoryStream = new MemoryStream();
+                        currSize = resultSize;
+                        noChunksInColumn = 1;
+                    }
+                    else
+                    {
+                        noChunksInColumn++;
+                    }
                     memoryStream.Write(result, 0, result.Length);
                 }
 
-                data = memoryStream.ToArray();
+                column.Set(memoryStream.ToArray());
+                column.SetNumberOfChunks(noChunksInColumn);
             }
-            var entity = new AppendOnlyStoreTableEntity
-                {
-                    Data = data
-                };
+            finally
+            {
+                memoryStream.Dispose();
+            }
             return entity;
-        }
-
-        private byte[] ComputeHash(byte[] data)
-        {
-            return _sha1Managed.ComputeHash(data);
         }
 
     }
