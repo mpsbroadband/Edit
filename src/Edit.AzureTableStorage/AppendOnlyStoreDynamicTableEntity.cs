@@ -135,6 +135,14 @@ namespace Edit.AzureTableStorage
             }
         }
 
+        public int NumberOfChunks
+        {
+            get
+            {
+                return _columns.Select(dataColumn => dataColumn.GetNumberOfChunks()).Sum();
+            }
+        }
+
         public bool IsFull
         {
             get
