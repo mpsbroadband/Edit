@@ -81,6 +81,8 @@
     <Compile Include="ColumnsWrapper.cs" />
     <Compile Include="DataColumn.cs" />
     <Compile Include="DataRow.cs" />
+    <Compile Include="IChunkSerializer.cs" />
+    <Compile Include="MultipleRowsDataEntity.cs" />
     <Compile Include="IFramer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

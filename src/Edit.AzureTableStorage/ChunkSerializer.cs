@@ -5,7 +5,7 @@ using System.Security.Cryptography;
 
 namespace Edit.AzureTableStorage
 {
-    public class ChunkSerializer
+    public class ChunkSerializer : IChunkSerializer
     {
         private readonly ISerializer _serializer;
         private readonly SHA1Managed _sha1Managed = new SHA1Managed();

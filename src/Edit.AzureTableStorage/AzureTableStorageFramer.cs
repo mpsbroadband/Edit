@@ -8,21 +8,47 @@ using System.Threading.Tasks;
 
 namespace Edit.AzureTableStorage
 {
-    public class AzureTableStorageFramer : IFramer
+    internal class AzureTableStorageFramer : IFramer
     {
-        private readonly ChunkSerializer _serializer;
+        private readonly IChunkSerializer _serializer;
 
         public AzureTableStorageFramer(ISerializer serializer)
         {
             _serializer = new ChunkSerializer(serializer);
         }
 
+        private byte[] ReadChunksBlob(IEnumerator<DataColumn> columnsEnum)
+        {
+            var column = columnsEnum.Current;
+            var data = column.Get();
+            while (column.ContainsMultipleColumnsChunk())
+            {
+                if (!columnsEnum.MoveNext())
+                {
+                    throw new CorruptedStorageException("Could not read multiple columns chunk");
+                }
+                column = columnsEnum.Current;
+                var newData = column.Get();
+                var buffer = new byte[data.Length + newData.Length];
+                System.Buffer.BlockCopy(data, 0, buffer, 0, data.Length);
+                System.Buffer.BlockCopy(newData, 0, buffer, data.Length, newData.Length);
+                data = buffer;
+                if (column.IsLastPieceOfMultipleColumnsChunk())
+                {
+                    break;
+                }
+            }
+            return data;
+        }
+
         private IEnumerable<T> ReadColumns<T>(IEnumerable<DataColumn> columns) where T : class
         {
             var frames = new List<T>();
-            foreach (var column in columns)
+            var columnsEnum = columns.GetEnumerator();
+            while (columnsEnum.MoveNext())
             {
-                var columnFrames = ReadColumn<T>(column);
+                var data = ReadChunksBlob(columnsEnum);
+                var columnFrames = ReadChunks<T>(data);
                 int cnt = 0;
                 foreach (var columnFrame in columnFrames)
                 {
@@ -37,9 +63,8 @@ namespace Edit.AzureTableStorage
             return frames;
         }
 
-        private IEnumerable<T> ReadColumn<T>(DataColumn column) where T : class
+        private IEnumerable<T> ReadChunks<T>(byte[] data) where T : class
         {
-            byte[] data = column.Get();
             if (data != null)
             {
                 return _serializer.Read<T>(data);
@@ -47,65 +72,21 @@ namespace Edit.AzureTableStorage
             return Enumerable.Empty<T>();
         }
 
-        public IEnumerable<T> Read<T>(AppendOnlyStoreTableEntity entity) where T : class
+        public IEnumerable<T> Read<T>(IEnumerable<AppendOnlyStoreTableEntity> entities) where T : class
         {
-            var columns = new ColumnsWrapper(entity);
-            return ReadColumns<T>(columns.DataColumns);
+            List<T> frames = new List<T>();
+            foreach (var appendOnlyStoreTableEntity in entities)
+            {
+                var columns = new ColumnsWrapper(appendOnlyStoreTableEntity);
+                frames.AddRange(ReadColumns<T>(columns.DataColumns));
+            }
+            return frames;
         }
 
-        public AppendOnlyStoreTableEntity Write<T>(IEnumerable<T> frames) where T : class
+        public IEnumerable<AppendOnlyStoreTableEntity> Write<T>(IEnumerable<T> frames, AzureTableStorageEntryDataVersion version) where T : class
         {
-            var entity = new AppendOnlyStoreTableEntity();
-            var columns = new ColumnsWrapper(entity).DataColumns.GetEnumerator();
-            var memoryStream = new MemoryStream();
-
-            try
-            {
-                int currSize = 0;
-                int noChunksInColumn = 0;
-                columns.MoveNext();
-                DataColumn column = columns.Current;
-                foreach (var frame in frames)
-                {
-                    var result = _serializer.Write(frame);
-                    int resultSize = result.Length;
-                    if (resultSize > DataColumn.MaxSize)
-                        // Cannot handle single message being larger than one column. Could be fixed by allowing a message to expand to multiple columns and rows
-                    {
-                        throw new StorageSizeException("Messages larger than " + DataColumn.MaxSize +
-                                                       " bytes is not supported");
-                    }
-                    currSize += resultSize;
-                    if (currSize > DataColumn.MaxSize)
-                    {
-                        column.Set(memoryStream.ToArray());
-                        column.SetNumberOfChunks(noChunksInColumn);
-                        if (!columns.MoveNext())
-                        {
-                            throw new StorageSizeException(
-                                "Aggregates larger than one row is not supported yet. Multi row support is coming.");
-                        }
-                        column = columns.Current;
-                        memoryStream.Dispose();
-                        memoryStream = new MemoryStream();
-                        currSize = resultSize;
-                        noChunksInColumn = 1;
-                    }
-                    else
-                    {
-                        noChunksInColumn++;
-                    }
-                    memoryStream.Write(result, 0, result.Length);
-                }
-
-                column.Set(memoryStream.ToArray());
-                column.SetNumberOfChunks(noChunksInColumn);
-            }
-            finally
-            {
-                memoryStream.Dispose();
-            }
-            return entity;
+            MultipleRowsDataEntity multiRowsEntity = new MultipleRowsDataEntity(_serializer);
+            return multiRowsEntity.GetUpdatedDataRows(frames, version);
         }
 
     }

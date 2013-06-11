@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace Edit.AzureTableStorage
 {
-    public interface IFramer
+    internal interface IFramer
     {
-        IEnumerable<T> Read<T>(AppendOnlyStoreTableEntity entity) where T : class;
-        AppendOnlyStoreTableEntity Write<T>(IEnumerable<T> frames) where T : class;
+        IEnumerable<T> Read<T>(IEnumerable<AppendOnlyStoreTableEntity> entities) where T : class;
+        IEnumerable<AppendOnlyStoreTableEntity> Write<T>(IEnumerable<T> frames, AzureTableStorageEntryDataVersion version) where T : class;
     }
 }

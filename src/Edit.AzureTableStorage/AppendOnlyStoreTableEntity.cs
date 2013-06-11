@@ -32,5 +32,6 @@ namespace Edit.AzureTableStorage
         public int NoChunksInData12 { get; set; }
         public int NoChunksInData13 { get; set; }
         public bool IsFull { get; set; }
+        public int FirstChunkNoWrittenToRow { get; set; }
     }
 }

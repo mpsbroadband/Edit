@@ -15,11 +15,7 @@ namespace Edit.Tests
         private Establish context = () =>
         {
             eventStore = Bootstrapper.WireupEventStore();
-
-            for (int i = 0; i < NoMessages; i++)
-            {
-                aLotOfMessages.Add(new TestMessage{ Data = "Message number " + i});
-            }
+            aLotOfMessages = TestMessage.CreateTestMessages(NoMessages);
         };
 
         private Because of = () =>

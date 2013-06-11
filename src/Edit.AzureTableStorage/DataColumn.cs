@@ -12,8 +12,12 @@ namespace Edit.AzureTableStorage
         private readonly Func<byte[]> _getter;
         private readonly Action<int> _noChunksSetter;
         private readonly Func<int> _noChunksGetter;
+        private bool _containsMultipleColumnsChunk;
 
-        public const int MaxSize = 65536;
+        private const int MultipleColumnsChunk = -1;
+        private const int LastPieceOfMultipleColumnsChunk = -2;
+
+        public const int MaxSize = 65536; // 64KB
 
         public DataColumn(Action<byte[]> setter, Func<byte[]> getter, Action<int> noChunksSetter, Func<int> noChunksGetter)
         {
@@ -35,12 +39,39 @@ namespace Edit.AzureTableStorage
 
         public void SetNumberOfChunks(int noChunks)
         {
-            _noChunksSetter(noChunks);
+            if (!_containsMultipleColumnsChunk)
+            {
+                _noChunksSetter(noChunks);
+            }
         }
 
         public int GetNumberOfChunks()
         {
             return _noChunksGetter();
+        }
+
+        public void MarkAsMultipleColumnChunk()
+        {
+            SetNumberOfChunks(MultipleColumnsChunk);
+            _containsMultipleColumnsChunk = true;
+        }
+
+        public void MarkAsLastPieceOfMultipleColumnChunk()
+        {
+            SetNumberOfChunks(LastPieceOfMultipleColumnsChunk);
+            _containsMultipleColumnsChunk = true;
+        }
+
+        public bool ContainsMultipleColumnsChunk()
+        {
+            int chunkNo = GetNumberOfChunks();
+            return chunkNo == MultipleColumnsChunk
+                || chunkNo == LastPieceOfMultipleColumnsChunk;
+        }
+
+        public bool IsLastPieceOfMultipleColumnsChunk()
+        {
+            return GetNumberOfChunks() == LastPieceOfMultipleColumnsChunk;
         }
     }
 }

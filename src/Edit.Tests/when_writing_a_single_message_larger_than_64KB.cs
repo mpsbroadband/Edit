@@ -10,6 +10,7 @@ namespace Edit.Tests
     public class when_writing_a_single_message_larger_than_64KB
     {
         protected static TestMessage hugeMessage;
+        protected static TestMessage readMessage;
 
         private Establish context = () =>
         {
@@ -31,19 +32,19 @@ namespace Edit.Tests
                 exception = Catch.Exception(() =>
                     eventStore.WriteAsync(streamName, chunks, null).Wait());
 
+                var chunkset = eventStore.ReadAsync(streamName).Result;
+                readMessage = chunkset.Chunks.First().Instance as TestMessage;
             };
 
-        private It should_have_an_exception = () =>
+        private It should_have_no_exception = () =>
         {
-            exception.ShouldNotBeNull();
+            exception.ShouldBeNull();
         };
 
-        private It should_have_a_storage_size_exception = () =>
-        {
-            var aggregateException = exception as AggregateException;
-            var innerException = aggregateException.InnerExceptions.FirstOrDefault() as StorageSizeException;
-            innerException.ShouldNotBeNull();
-        };
+        private It the_message_read_should_be_the_same = () =>
+            {
+                readMessage.Data.ShouldEqual(hugeMessage.Data);
+            };
 
         protected static IStreamStore eventStore;
         protected static Exception exception;

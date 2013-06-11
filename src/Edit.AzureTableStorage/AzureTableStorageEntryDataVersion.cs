@@ -10,9 +10,9 @@ namespace Edit.AzureTableStorage
     {
         internal String Version { get; set; }
 
-        internal String LastRowKey { get; set; }
+        internal int LastRowKey { get; set; }
         
-        internal Guid? IdOfFirstDataInLastRow { get; set; }
+        internal int FirstChunkNoOfRow { get; set; }
 
         public override string ToString()
         {

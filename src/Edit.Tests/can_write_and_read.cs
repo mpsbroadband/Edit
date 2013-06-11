@@ -9,6 +9,16 @@ namespace Edit.Tests
     public class TestMessage
     {
         public string Data { get; set; }
+
+        public static List<TestMessage> CreateTestMessages(int noMessages)
+        {
+            var messages = new List<TestMessage>();
+            for (int i = 0; i < noMessages; i++)
+            {
+                messages.Add(new TestMessage { Data = "Message number " + i });
+            }
+            return messages;
+        }
     }
 
     public class can_write_and_read

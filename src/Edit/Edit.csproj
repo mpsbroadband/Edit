@@ -53,6 +53,7 @@
     <Compile Include="Chunk.cs" />
     <Compile Include="ChunkSet.cs" />
     <Compile Include="ConcurrencyException.cs" />
+    <Compile Include="CorruptedStorageException.cs" />
     <Compile Include="IStoredDataVersion.cs" />
     <Compile Include="IStreamStore.cs" />
     <Compile Include="ISerializer.cs" />

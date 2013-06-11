@@ -16,14 +16,15 @@ namespace Edit.AzureTableStorage
         private string _tableName;
         private readonly IFramer _framer;
 
-        public const int MaxColumnSize = 65355;
+        /// <summary>
+        /// When running the storage emulator the maximum storage per database row is less than in product
+        /// </summary>
+        public static bool IsStorageEmulator { get; set; }
 
-        public AzureTableStorageAppendOnlyStore(IFramer framer)
+        internal AzureTableStorageAppendOnlyStore(IFramer framer)
         {
             _framer = framer;
         }
-
-        private const string RowKey = "0";
 
         public static async Task<IStreamStore> CreateAsync(CloudStorageAccount cloudStorageAccount, string tableName, ISerializer serializer)
         {
@@ -64,23 +65,81 @@ namespace Edit.AzureTableStorage
         public Task WriteAsync(string streamName, IEnumerable<Chunk> chunks, TimeSpan timeout,
                                      CancellationToken token, IStoredDataVersion expectedVersion)
         {
-            var entity = _framer.Write(chunks);
-            entity.PartitionKey = streamName;
-            entity.RowKey = RowKey;
-
+            AzureTableStorageEntryDataVersion azureDataVersion = null;
+            bool isNewEntity = true;
             String version = null;
             if (expectedVersion != null)
             {
-                var azureDataVersion = expectedVersion as AzureTableStorageEntryDataVersion;
+                azureDataVersion = expectedVersion as AzureTableStorageEntryDataVersion;
                 if (azureDataVersion == null)
                 {
                     throw new ConcurrencyException(streamName, expectedVersion);
                 }
                 version = azureDataVersion.Version;
+                isNewEntity = false; // If an expected version is available, this is an update of existing data
             }
-            entity.ETag = version ?? "*"; // "*" means that it will overwrite it and discard optimistic concurrency
 
-            return WriteAsync(streamName, entity, timeout, token, expectedVersion);
+            var updatedEntities = _framer.Write(chunks, azureDataVersion);
+            AppendOnlyStoreTableEntity firstEntity = null, secondEntity = null;
+            int noEntities = 0;
+            foreach (var entity in updatedEntities)
+            {
+                entity.PartitionKey = streamName;
+                noEntities++;
+                if (noEntities == 1)
+                {
+                    entity.ETag = version ?? "*"; // "*" means that it will overwrite it and discard optimistic concurrency                    
+                }
+                else if ((noEntities == 2 && isNewEntity) || noEntities > 2) // We do not allow more than one updated row and one new row. The limitation is on the batch updated on the Azure Table Storage. At most it can insert/update 4 MB of data per batch
+                {
+                    throw new StorageSizeException("Cannot write new data that produces more than one new table row (about 1MB of new data)");
+                }
+                else // If more than 1 updated rows, the first is an updated row and the second a new row
+                {
+                    entity.ETag = "*";
+                }
+                if (firstEntity == null)
+                {
+                    firstEntity = entity;
+                }
+                else if (secondEntity == null)
+                {
+                    secondEntity = entity;
+                }
+            }
+
+            if (noEntities == 1)
+            {
+                return WriteAsync(streamName, firstEntity, timeout, token, expectedVersion);
+            }
+            else
+            {
+                return WriteMultipleEntitiesAsync(streamName, firstEntity, secondEntity, timeout, token, expectedVersion);
+            }
+        }
+
+        private async Task WriteMultipleEntitiesAsync(string streamName, AppendOnlyStoreTableEntity entityToUpdate, AppendOnlyStoreTableEntity entityToInsert, TimeSpan timeout, CancellationToken token, IStoredDataVersion expectedVersion)
+        {
+            var cloudTableClient = _cloudStorageAccount.CreateCloudTableClient();
+            var cloudTable = cloudTableClient.GetTableReference(_tableName);
+
+            var tableBatch = new TableBatchOperation();
+            tableBatch.Replace(entityToUpdate);
+            tableBatch.Insert(entityToInsert);
+
+            //cloudTable.ExecuteBatch(tableBatch);
+            try
+            {
+                var tableResult =
+                    await
+                    Task.Factory.FromAsync<IList<TableResult>>(cloudTable.BeginExecuteBatch(tableBatch, null, null),
+                                                               cloudTable.EndExecuteBatch);
+            }
+            catch (StorageException e)
+            {
+                Logger.Error("Error executing table batch " + e);
+                throw;
+            }
         }
 
         private async Task WriteAsync(string streamName, AppendOnlyStoreTableEntity entity, TimeSpan timeout, CancellationToken token, IStoredDataVersion expectedVersion)
@@ -112,7 +171,7 @@ namespace Edit.AzureTableStorage
 
             if (isMissing)
             {
-                await InsertEmptyAsync(streamName, timeout, token);
+                await InsertEmptyAsync(streamName, timeout, token, entity.RowKey);
                 await WriteAsync(streamName, entity, timeout, token, expectedVersion);
             }
         }
@@ -145,8 +204,11 @@ namespace Edit.AzureTableStorage
 
             try
             {
+                var entities = new List<AppendOnlyStoreTableEntity>();
+                AppendOnlyStoreTableEntity lastEntity = null;
+                int currRowKey = MultipleRowsDataEntity.FirstRowKey;
                 Logger.DebugFormat("BEGIN: Retrieve cloud table entity async id: '{0}', thread: '{1}'", streamName, Thread.CurrentThread.ManagedThreadId);
-                var entity = await cloudTable.RetrieveAsync<AppendOnlyStoreTableEntity>(streamName, RowKey);
+                var entity = lastEntity = await cloudTable.RetrieveAsync<AppendOnlyStoreTableEntity>(streamName, currRowKey.ToString());
                 Logger.DebugFormat("END: Retrieve cloud table entity async id: '{0}', thread: '{1}'", streamName, Thread.CurrentThread.ManagedThreadId);
 
                 if (entity == null)
@@ -156,8 +218,19 @@ namespace Edit.AzureTableStorage
                 }
                 else
                 {
-                    var chunks = _framer.Read<Chunk>(entity);
-                    return new ChunkSet(chunks, new AzureTableStorageEntryDataVersion { Version = entity.ETag, LastRowKey = "0", IdOfFirstDataInLastRow = null });
+                    entities.Add(entity);
+                    while (entity != null && entity.IsFull)
+                    {
+                        currRowKey++;
+                        entity = await cloudTable.RetrieveAsync<AppendOnlyStoreTableEntity>(streamName, currRowKey.ToString());
+                        if (entity != null)
+                        {
+                            lastEntity = entity;
+                            entities.Add(entity);
+                        }
+                    }
+                    var chunks = _framer.Read<Chunk>(entities);
+                    return new ChunkSet(chunks, new AzureTableStorageEntryDataVersion { Version = lastEntity.ETag, LastRowKey = int.Parse(lastEntity.RowKey), FirstChunkNoOfRow = lastEntity.FirstChunkNoWrittenToRow });
                 }
             }
             catch (StorageException exception)
@@ -184,7 +257,7 @@ namespace Edit.AzureTableStorage
             return await ReadAsync(streamName, timeout, token);
         }
 
-        private async Task InsertEmptyAsync(string streamName, TimeSpan timeout, CancellationToken token)
+        private async Task InsertEmptyAsync(string streamName, TimeSpan timeout, CancellationToken token, String rowKey)
         {
             var cloudTableClient = _cloudStorageAccount.CreateCloudTableClient();
             var cloudTable = cloudTableClient.GetTableReference(_tableName);
@@ -193,7 +266,7 @@ namespace Edit.AzureTableStorage
             {
                 ETag = "*",
                 PartitionKey = streamName,
-                RowKey = RowKey,
+                RowKey = rowKey,
                 Data = new byte[0]
             };
 
