@@ -11,7 +11,7 @@ namespace Edit.Tests
         protected static TestMessage lastWrittenMessage = new TestMessage { Data = "Last Message" };
         protected static ChunkSet readChunks;
         protected static List<TestMessage> readMessages = new List<TestMessage>();
-        protected const int NoMessages = 2831;
+        protected const int NoMessages = 8000; //2831;
 
         private Establish context = () =>
         {
@@ -23,15 +23,29 @@ namespace Edit.Tests
             }
             streamName = Guid.NewGuid().ToString();
 
-            eventStore.WriteAsync(streamName, chunkMessages.Take(NoMessages/2), null).Wait();
-            chunkMessages.Add(new Chunk{ Instance = lastWrittenMessage });
+            // Write first db row
+            eventStore.WriteAsync(streamName, chunkMessages.Take(NoMessages/4), null).Wait();
 
             readChunks = eventStore.ReadAsync(streamName).Result;
+
+            // Expanded to 2 rows
+            eventStore.WriteAsync(streamName, chunkMessages.Take(NoMessages / 2), readChunks.Version).Wait();
+
+            readChunks = eventStore.ReadAsync(streamName).Result;
+
+            // Expanded to 3 rows
+            int noMess = (int) ((NoMessages/4)*3);
+            eventStore.WriteAsync(streamName, chunkMessages.Take(noMess), readChunks.Version).Wait();
+
+            readChunks = eventStore.ReadAsync(streamName).Result;
+
+            // Expanded to 4 rows
+            chunkMessages.Add(new Chunk { Instance = lastWrittenMessage });
+            eventStore.WriteAsync(streamName, chunkMessages, readChunks.Version).Wait();
         };
 
         private Because of = () =>
         {
-            eventStore.WriteAsync(streamName, chunkMessages, readChunks.Version).Wait();
 
             var chunkset = eventStore.ReadAsync(streamName).Result;
 
@@ -46,9 +60,13 @@ namespace Edit.Tests
             readMessages.Count.ShouldEqual(chunkMessages.Count);
         };
 
-        private It last_message_written_is_same_as_last_message_read = () =>
+        private It the_messages_read_are_the_same_as_the_ones_written = () =>
         {
-            readMessages.Last().Data.ShouldEqual(lastWrittenMessage.Data);
+            for (int i = 0; i < chunkMessages.Count; i++)
+            {
+                (chunkMessages[i].Instance as TestMessage).Data.ShouldEqual(readMessages[i].Data);
+            }
+            //readMessages.Last().Data.ShouldEqual(lastWrittenMessage.Data);
         };
 
 

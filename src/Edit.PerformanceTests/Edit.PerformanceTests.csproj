@@ -45,11 +45,11 @@
     </Reference>
     <Reference Include="Microsoft.Data.Edm, Version=5.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>Dependencies\Microsoft\WindowsAzureStorage\Microsoft.Data.Edm.dll</HintPath>
+      <HintPath>Dependencies\Microsoft\OData\Microsoft.Data.Edm.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Data.OData, Version=5.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>Dependencies\Microsoft\WindowsAzureStorage\Microsoft.Data.OData.dll</HintPath>
+      <HintPath>Dependencies\Microsoft\OData\Microsoft.Data.OData.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.WindowsAzure.Configuration, Version=1.8.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -73,7 +73,7 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Spatial, Version=5.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>Dependencies\Microsoft\WindowsAzureStorage\System.Spatial.dll</HintPath>
+      <HintPath>Dependencies\Microsoft\OData\System.Spatial.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

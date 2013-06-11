@@ -120,11 +120,20 @@ namespace Edit.AzureTableStorage
 
             try
             {
-                await cloudTable.ExecuteBatchAsync(tableBatch);
+                var result = cloudTable.ExecuteBatchAsync(tableBatch).Result;
+                foreach (var tableResult in result)
+                {
+                    var tmp = tableResult.HttpStatusCode;
+                }
             }
             catch (StorageException e)
             {
                 Logger.Error("Error executing table batch " + e);
+                throw;
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("ERROR " + ex);
                 throw;
             }
         }

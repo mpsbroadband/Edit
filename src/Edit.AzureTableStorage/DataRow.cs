@@ -9,7 +9,7 @@ namespace Edit.AzureTableStorage
         private DataColumn _currentColumn;
         private MemoryStream _memoryStream;
         private bool _isEmpty = true;
-        private const int MaxSizeStorageEmulator = 5*64*1024; // about 5 data columns is max for the Storage Emulator
+        private const int MaxSizeStorageEmulator = 300*1024; // Storage limit of emulator
         private const int MaxSizeProduction = 900*1024; // 900 KB. Max DB row size is 1 MB. We allow the data in the data columns to be 900 KB, leaving storage for other columns, column titles, etc
 
         public static int MaxDataSize

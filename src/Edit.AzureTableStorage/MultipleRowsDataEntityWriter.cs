@@ -16,7 +16,7 @@ namespace Edit.AzureTableStorage
 
         private int FastForwardToFirstChunkInLastWrittenRow<T>(int currChunkNo, int firstChunkOfRow, IEnumerator<T> chunkEnum) where T : class
         {
-            while (currChunkNo < firstChunkOfRow)
+            while (currChunkNo < (firstChunkOfRow-1))
             {
                 if (chunkEnum.MoveNext())
                 {

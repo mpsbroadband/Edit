@@ -15,7 +15,7 @@ namespace Edit.PerformanceTests
     {
         private static readonly List<Guid> _ids = new List<Guid>();
 
-        const int NumberOfInsertions = 10;
+        const int NumberOfInsertions = 1000;
 
         public static void Main(string[] args)
         {
@@ -82,7 +82,7 @@ namespace Edit.PerformanceTests
         private async Task<IStreamStore> WireupEventStoreAsync()
         {
             var cloudStorageAccount = CloudStorageAccount.DevelopmentStorageAccount;
-
+            AzureTableStorageAppendOnlyStore.IsStorageEmulator = true;
             return await AzureTableStorageAppendOnlyStore.CreateAsync(cloudStorageAccount, "performancetests", new JsonNetSerializer(new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.Objects }));
         }
     }
