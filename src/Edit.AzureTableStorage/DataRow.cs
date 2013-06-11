@@ -1,31 +1,36 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 
 namespace Edit.AzureTableStorage
 {
     internal class DataRow : IDisposable
     {
-        private readonly AppendOnlyStoreTableEntity _entity;
-        private readonly IEnumerator<DataColumn> _columns;
+        private readonly AppendOnlyStoreDynamicTableEntity _entity;
         private DataColumn _currentColumn;
-        private int _currentColumnNo = 0;
-        private MemoryStream _memoryStream = null;
+        private MemoryStream _memoryStream;
         private bool _isEmpty = true;
+        private const int MaxSizeStorageEmulator = 5*64*1024; // about 5 data columns is max for the Storage Emulator
+        private const int MaxSizeProduction = 900*1024; // 900 KB. Max DB row size is 1 MB. We allow the data in the data columns to be 900 KB, leaving storage for other columns, column titles, etc
 
-        public static int MaxSize
+        public static int MaxDataSize
         {
-            get { return ColumnsWrapper.NumberOfColumnsPerRow * DataColumn.MaxSize; }
+            get
+            {
+                if (AzureTableStorageAppendOnlyStore.IsStorageEmulator)
+                {
+                    return MaxSizeStorageEmulator;
+                }
+                return MaxSizeProduction;
+            }
         }
 
         public DataRow(int currentChunkNo, int currentRowNo)
         {
-            _entity = new AppendOnlyStoreTableEntity
+            _entity = new AppendOnlyStoreDynamicTableEntity
                 {
                     FirstChunkNoWrittenToRow = currentChunkNo,
                     RowKey = currentRowNo.ToString()
                 };
-            _columns = new ColumnsWrapper(_entity).DataColumns.GetEnumerator();
             MoveNextColumn();
         }
 
@@ -39,11 +44,10 @@ namespace Edit.AzureTableStorage
             {
                 _memoryStream.Dispose();
             }
-            bool canMove = _columns.MoveNext();
+            bool canMove = _entity.MoveNextColumn();
             if (canMove)
             {
-                _currentColumnNo++;
-                _currentColumn = _columns.Current;
+                _currentColumn = _entity.CurrentColumn;
                 _memoryStream = new MemoryStream();
                 _noChunksInCurrentColumn = 0;
             }
@@ -57,7 +61,7 @@ namespace Edit.AzureTableStorage
 
         private int _noChunksInCurrentColumn;
         private int _currentColumnSize;
-        private bool _isFull = false;
+        private bool _isFull;
 
         private void FlagCurrentColumnAsMultipleColumnsChunk()
         {
@@ -72,11 +76,6 @@ namespace Edit.AzureTableStorage
         private bool WriteLargeChunkToMultipleColumns(byte[] result)
         {
             int resultSize = result.Length;
-            if (!CanFitChunkLargerThanColumnSize(resultSize))
-            {
-                return false;
-            }
-            
             if (!IsCurrentColumnEmpty())
             {
                 FlushChunks();
@@ -113,11 +112,16 @@ namespace Edit.AzureTableStorage
                 return false;
             }
             int resultSize = result.Length;
-            if (resultSize > DataRow.MaxSize)
+            if (resultSize > MaxDataSize)
             // Cannot handle single message being larger than one column. Could be fixed by allowing a message to expand to multiple columns and rows
             {
-                throw new StorageSizeException("Messages larger than " + DataRow.MaxSize +
+                throw new StorageSizeException("Messages larger than " + MaxDataSize +
                                                " bytes is not supported");
+            }
+            if (!CanFitChunk(resultSize))
+            {
+                _isFull = true;
+                return false;
             }
             _isEmpty = false;
 
@@ -169,15 +173,13 @@ namespace Edit.AzureTableStorage
             {
                 if (IsEmpty())
                 {
-                    return MaxSize;
+                    return MaxDataSize;
                 }
-                int currentColumnHasDataCompensation = IsCurrentColumnEmpty() ? 0 : 1; // If current column has data it will not be used when writing large messages (larger than one column)
-                int noEmptyColumnsLeft = ColumnsWrapper.NumberOfColumnsPerRow - (_currentColumnNo - 1) - currentColumnHasDataCompensation;
-                return noEmptyColumnsLeft*DataColumn.MaxSize;
+                return MaxDataSize - _entity.DataSize;
             }
         }
 
-        private bool CanFitChunkLargerThanColumnSize(int chunkSize)
+        private bool CanFitChunk(int chunkSize)
         {
             if (_isFull)
             {
@@ -186,7 +188,7 @@ namespace Edit.AzureTableStorage
             return chunkSize <= AvailableMaxMessageSize;
         }
 
-        public AppendOnlyStoreTableEntity CreateEntity()
+        public AppendOnlyStoreDynamicTableEntity CreateEntity()
         {
             FlushChunks();
             _entity.IsFull = _isFull;

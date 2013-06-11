@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Common.Logging;
@@ -28,7 +27,7 @@ namespace Edit.AzureTableStorage
 
         public static async Task<IStreamStore> CreateAsync(CloudStorageAccount cloudStorageAccount, string tableName, ISerializer serializer)
         {
-            var streamStore = new AzureTableStorageAppendOnlyStore(new AzureTableStorageFramer(serializer));
+            var streamStore = new AzureTableStorageAppendOnlyStore(new Framer(serializer));
             await streamStore.StartAsync(cloudStorageAccount, tableName);
             return streamStore;
         }
@@ -80,15 +79,17 @@ namespace Edit.AzureTableStorage
             }
 
             var updatedEntities = _framer.Write(chunks, azureDataVersion);
-            AppendOnlyStoreTableEntity firstEntity = null, secondEntity = null;
+            ITableEntity firstEntity = null, secondEntity = null;
             int noEntities = 0;
             foreach (var entity in updatedEntities)
             {
                 entity.PartitionKey = streamName;
                 noEntities++;
+
                 if (noEntities == 1)
                 {
                     entity.ETag = version ?? "*"; // "*" means that it will overwrite it and discard optimistic concurrency                    
+                    firstEntity = entity.Entity;
                 }
                 else if ((noEntities == 2 && isNewEntity) || noEntities > 2) // We do not allow more than one updated row and one new row. The limitation is on the batch updated on the Azure Table Storage. At most it can insert/update 4 MB of data per batch
                 {
@@ -97,14 +98,7 @@ namespace Edit.AzureTableStorage
                 else // If more than 1 updated rows, the first is an updated row and the second a new row
                 {
                     entity.ETag = "*";
-                }
-                if (firstEntity == null)
-                {
-                    firstEntity = entity;
-                }
-                else if (secondEntity == null)
-                {
-                    secondEntity = entity;
+                    secondEntity = entity.Entity;
                 }
             }
 
@@ -112,13 +106,10 @@ namespace Edit.AzureTableStorage
             {
                 return WriteAsync(streamName, firstEntity, timeout, token, expectedVersion);
             }
-            else
-            {
-                return WriteMultipleEntitiesAsync(streamName, firstEntity, secondEntity, timeout, token, expectedVersion);
-            }
+            return WriteMultipleEntitiesAsync(firstEntity, secondEntity, timeout, token, expectedVersion);
         }
 
-        private async Task WriteMultipleEntitiesAsync(string streamName, AppendOnlyStoreTableEntity entityToUpdate, AppendOnlyStoreTableEntity entityToInsert, TimeSpan timeout, CancellationToken token, IStoredDataVersion expectedVersion)
+        private async Task WriteMultipleEntitiesAsync(ITableEntity entityToUpdate, ITableEntity entityToInsert, TimeSpan timeout, CancellationToken token, IStoredDataVersion expectedVersion)
         {
             var cloudTableClient = _cloudStorageAccount.CreateCloudTableClient();
             var cloudTable = cloudTableClient.GetTableReference(_tableName);
@@ -127,13 +118,9 @@ namespace Edit.AzureTableStorage
             tableBatch.Replace(entityToUpdate);
             tableBatch.Insert(entityToInsert);
 
-            //cloudTable.ExecuteBatch(tableBatch);
             try
             {
-                var tableResult =
-                    await
-                    Task.Factory.FromAsync<IList<TableResult>>(cloudTable.BeginExecuteBatch(tableBatch, null, null),
-                                                               cloudTable.EndExecuteBatch);
+                await cloudTable.ExecuteBatchAsync(tableBatch);
             }
             catch (StorageException e)
             {
@@ -142,7 +129,7 @@ namespace Edit.AzureTableStorage
             }
         }
 
-        private async Task WriteAsync(string streamName, AppendOnlyStoreTableEntity entity, TimeSpan timeout, CancellationToken token, IStoredDataVersion expectedVersion)
+        private async Task WriteAsync(string streamName, ITableEntity entity, TimeSpan timeout, CancellationToken token, IStoredDataVersion expectedVersion)
         {
             var cloudTableClient = _cloudStorageAccount.CreateCloudTableClient();
             var cloudTable = cloudTableClient.GetTableReference(_tableName);
@@ -204,11 +191,11 @@ namespace Edit.AzureTableStorage
 
             try
             {
-                var entities = new List<AppendOnlyStoreTableEntity>();
-                AppendOnlyStoreTableEntity lastEntity = null;
-                int currRowKey = MultipleRowsDataEntity.FirstRowKey;
+                var entities = new List<AppendOnlyStoreDynamicTableEntity>();
+                int currRowKey = MultipleRowsDataEntityWriter.FirstRowKey;
                 Logger.DebugFormat("BEGIN: Retrieve cloud table entity async id: '{0}', thread: '{1}'", streamName, Thread.CurrentThread.ManagedThreadId);
-                var entity = lastEntity = await cloudTable.RetrieveAsync<AppendOnlyStoreTableEntity>(streamName, currRowKey.ToString());
+                var entity = await cloudTable.RetrieveAsync(streamName, currRowKey.ToString());
+                //var entity = await cloudTable.RetrieveAsync<DynamicTableEntity>(streamName, currRowKey.ToString());
                 Logger.DebugFormat("END: Retrieve cloud table entity async id: '{0}', thread: '{1}'", streamName, Thread.CurrentThread.ManagedThreadId);
 
                 if (entity == null)
@@ -218,15 +205,17 @@ namespace Edit.AzureTableStorage
                 }
                 else
                 {
-                    entities.Add(entity);
-                    while (entity != null && entity.IsFull)
+                    AppendOnlyStoreDynamicTableEntity lastEntity = AppendOnlyStoreDynamicTableEntity.Parse(entity);
+                    entities.Add(lastEntity);
+                    while (lastEntity != null && lastEntity.IsFull)
                     {
                         currRowKey++;
-                        entity = await cloudTable.RetrieveAsync<AppendOnlyStoreTableEntity>(streamName, currRowKey.ToString());
+                        entity = await cloudTable.RetrieveAsync(streamName, currRowKey.ToString());
+                        //entity = await cloudTable.RetrieveAsync<DynamicTableEntity>(streamName, currRowKey.ToString());
                         if (entity != null)
                         {
-                            lastEntity = entity;
-                            entities.Add(entity);
+                            lastEntity = AppendOnlyStoreDynamicTableEntity.Parse(entity);
+                            entities.Add(lastEntity);
                         }
                     }
                     var chunks = _framer.Read<Chunk>(entities);
@@ -262,13 +251,12 @@ namespace Edit.AzureTableStorage
             var cloudTableClient = _cloudStorageAccount.CreateCloudTableClient();
             var cloudTable = cloudTableClient.GetTableReference(_tableName);
 
-            var entity = new AppendOnlyStoreTableEntity()
+            var entity = new AppendOnlyStoreDynamicTableEntity
             {
                 ETag = "*",
                 PartitionKey = streamName,
-                RowKey = rowKey,
-                Data = new byte[0]
-            };
+                RowKey = rowKey
+            }.Entity;
 
             try
             {

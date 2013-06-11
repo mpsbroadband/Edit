@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Edit.AzureTableStorage
 {
@@ -17,7 +13,7 @@ namespace Edit.AzureTableStorage
         private const int MultipleColumnsChunk = -1;
         private const int LastPieceOfMultipleColumnsChunk = -2;
 
-        public const int MaxSize = 65536; // 64KB
+        public const int MaxSize = 64*1024; // 64KB
 
         public DataColumn(Action<byte[]> setter, Func<byte[]> getter, Action<int> noChunksSetter, Func<int> noChunksGetter)
         {

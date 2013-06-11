@@ -1,4 +1,5 @@
-﻿using Microsoft.WindowsAzure.Storage.Table;
+﻿using System.Collections.Generic;
+using Microsoft.WindowsAzure.Storage.Table;
 using System.Threading.Tasks;
 
 namespace Edit.AzureTableStorage
@@ -17,11 +18,25 @@ namespace Edit.AzureTableStorage
                 Task<TableResult>.Factory.FromAsync(cloudTable.BeginExecute, cloudTable.EndExecute, tableOperation, null);
         }
 
+        public static async Task<IList<TableResult>> ExecuteBatchAsync(this CloudTable cloudTable, TableBatchOperation tableBatchOperation)
+        {
+            return
+                await
+                Task<IList<TableResult>>.Factory.FromAsync(cloudTable.BeginExecuteBatch, cloudTable.EndExecuteBatch, tableBatchOperation, null);
+        }
+
         public static async Task<T> RetrieveAsync<T>(this CloudTable cloudTable, string partitionKey, string rowKey) where T : class, ITableEntity
         {
             var retrieveOperation = TableOperation.Retrieve<T>(partitionKey, rowKey);
             var task = await cloudTable.ExecuteAsync(retrieveOperation);
             return task.Result as T;
+        }
+
+        public static async Task<ITableEntity> RetrieveAsync(this CloudTable cloudTable, string partitionKey, string rowKey)
+        {
+            var retrieveOperation = TableOperation.Retrieve(partitionKey, rowKey);
+            var task = await cloudTable.ExecuteAsync(retrieveOperation);
+            return task.Result as ITableEntity;
         }
 
         public static async Task InsertAsync<T>(this CloudTable cloudTable, T tableEntity) where T : class, ITableEntity

@@ -1,20 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.WindowsAzure.Storage;
+﻿using System.Collections.Generic;
+using Microsoft.WindowsAzure.Storage.Table;
 
 namespace Edit.AzureTableStorage
 {
-    internal class MultipleRowsDataEntity
+    internal class MultipleRowsDataEntityWriter
     {
         private readonly IChunkSerializer _serializer;
 
         public const int FirstRowKey = 0;
 
-        public MultipleRowsDataEntity(IChunkSerializer serializer)
+        public MultipleRowsDataEntityWriter(IChunkSerializer serializer)
         {
             _serializer = serializer;
         }
@@ -35,9 +30,9 @@ namespace Edit.AzureTableStorage
             return currChunkNo;
         }
 
-        private IEnumerable<AppendOnlyStoreTableEntity> WriteChunksToEntity<T>(IEnumerable<T> chunks, AzureTableStorageEntryDataVersion version = null) where T : class
+        private IEnumerable<AppendOnlyStoreDynamicTableEntity> WriteChunksToEntity<T>(IEnumerable<T> chunks, AzureTableStorageEntryDataVersion version = null) where T : class
         {
-            var entities = new List<AppendOnlyStoreTableEntity>();
+            var entities = new List<AppendOnlyStoreDynamicTableEntity>();
             var chunkEnum = chunks.GetEnumerator();
             int currChunkNo = 0;
             int currRowNo = FirstRowKey;
@@ -65,10 +60,6 @@ namespace Edit.AzureTableStorage
                 }
                 entities.Add(currentRow.CreateEntity());
             }
-            catch (Exception e)
-            {
-                throw;
-            }
             finally
             {
                 currentRow.Dispose();
@@ -76,17 +67,17 @@ namespace Edit.AzureTableStorage
             return entities;
         }
 
-        public IEnumerable<AppendOnlyStoreTableEntity> GetDataRows<T>(IEnumerable<T> chunks) where T : class
+        public IEnumerable<AppendOnlyStoreDynamicTableEntity> GetDataRows<T>(IEnumerable<T> chunks) where T : class
         {
             return WriteChunksToEntity(chunks);
         }
 
-        public IEnumerable<AppendOnlyStoreTableEntity> GetUpdatedDataRows<T>(IEnumerable<T> chunks, AzureTableStorageEntryDataVersion version) where T : class
+        public IEnumerable<AppendOnlyStoreDynamicTableEntity> GetUpdatedDataRows<T>(IEnumerable<T> chunks, AzureTableStorageEntryDataVersion version) where T : class
         {
             return WriteChunksToEntity(chunks, version);
         }
 
-        public IEnumerable<T> GetChunks<T>(IEnumerable<AppendOnlyStoreTableEntity> tableRows) where T : class
+        public IEnumerable<T> GetChunks<T>(IEnumerable<ITableEntity> tableRows) where T : class
         {
             return null;
         }

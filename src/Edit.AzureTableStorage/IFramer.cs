@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace Edit.AzureTableStorage
 {
     internal interface IFramer
     {
-        IEnumerable<T> Read<T>(IEnumerable<AppendOnlyStoreTableEntity> entities) where T : class;
-        IEnumerable<AppendOnlyStoreTableEntity> Write<T>(IEnumerable<T> frames, AzureTableStorageEntryDataVersion version) where T : class;
+        IEnumerable<T> Read<T>(IEnumerable<AppendOnlyStoreDynamicTableEntity> entities) where T : class;
+        IEnumerable<AppendOnlyStoreDynamicTableEntity> Write<T>(IEnumerable<T> frames, AzureTableStorageEntryDataVersion version) where T : class;
     }
 }

@@ -1,33 +1,28 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Edit.AzureTableStorage
 {
-    internal class AzureTableStorageFramer : IFramer
+    public class MultipleRowsDataEntityReader
     {
         private readonly IChunkSerializer _serializer;
 
-        public AzureTableStorageFramer(ISerializer serializer)
+        public MultipleRowsDataEntityReader(IChunkSerializer serializer)
         {
-            _serializer = new ChunkSerializer(serializer);
+            _serializer = serializer;
         }
 
-        private byte[] ReadChunksBlob(IEnumerator<DataColumn> columnsEnum)
+        private byte[] ReadChunksBlob(AppendOnlyStoreDynamicTableEntity entity)
         {
-            var column = columnsEnum.Current;
+            var column = entity.CurrentColumn;
             var data = column.Get();
             while (column.ContainsMultipleColumnsChunk())
             {
-                if (!columnsEnum.MoveNext())
+                if (!entity.MoveNextColumn())
                 {
                     throw new CorruptedStorageException("Could not read multiple columns chunk");
                 }
-                column = columnsEnum.Current;
+                column = entity.CurrentColumn;
                 var newData = column.Get();
                 var buffer = new byte[data.Length + newData.Length];
                 System.Buffer.BlockCopy(data, 0, buffer, 0, data.Length);
@@ -41,13 +36,12 @@ namespace Edit.AzureTableStorage
             return data;
         }
 
-        private IEnumerable<T> ReadColumns<T>(IEnumerable<DataColumn> columns) where T : class
+        private IEnumerable<T> ReadColumns<T>(AppendOnlyStoreDynamicTableEntity entity) where T : class
         {
             var frames = new List<T>();
-            var columnsEnum = columns.GetEnumerator();
-            while (columnsEnum.MoveNext())
+            while (entity.MoveNextColumn())
             {
-                var data = ReadChunksBlob(columnsEnum);
+                var data = ReadChunksBlob(entity);
                 var columnFrames = ReadChunks<T>(data);
                 int cnt = 0;
                 foreach (var columnFrame in columnFrames)
@@ -72,22 +66,14 @@ namespace Edit.AzureTableStorage
             return Enumerable.Empty<T>();
         }
 
-        public IEnumerable<T> Read<T>(IEnumerable<AppendOnlyStoreTableEntity> entities) where T : class
+        public IEnumerable<T> Read<T>(IEnumerable<AppendOnlyStoreDynamicTableEntity> entities) where T : class
         {
-            List<T> frames = new List<T>();
+            var frames = new List<T>();
             foreach (var appendOnlyStoreTableEntity in entities)
             {
-                var columns = new ColumnsWrapper(appendOnlyStoreTableEntity);
-                frames.AddRange(ReadColumns<T>(columns.DataColumns));
+                frames.AddRange(ReadColumns<T>(appendOnlyStoreTableEntity));
             }
             return frames;
         }
-
-        public IEnumerable<AppendOnlyStoreTableEntity> Write<T>(IEnumerable<T> frames, AzureTableStorageEntryDataVersion version) where T : class
-        {
-            MultipleRowsDataEntity multiRowsEntity = new MultipleRowsDataEntity(_serializer);
-            return multiRowsEntity.GetUpdatedDataRows(frames, version);
-        }
-
     }
 }

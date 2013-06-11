@@ -17,7 +17,7 @@ namespace Edit.Tests
             eventStore = Bootstrapper.WireupEventStore();
             hugeMessage = new TestMessage();
             StringBuilder sb = new StringBuilder();
-            for(int i = 0; i < DataColumn.MaxSize+1; i++)
+            for(int i = 0; i < DataColumn.MaxSize*3; i++)
             {
                 sb.Append((byte) 1);
             }

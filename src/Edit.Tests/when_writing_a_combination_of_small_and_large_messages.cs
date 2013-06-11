@@ -24,7 +24,10 @@ namespace Edit.Tests
                     new TestMessage {Data = "small 1"},
                     new TestMessage {Data = "small 2"},
                     new TestMessage {Data = "large 1" + sb.ToString()},
+                    new TestMessage {Data = "small 3"},
                     new TestMessage {Data = "large 2" + sb.ToString() + "2"},
+                    new TestMessage {Data = "small 4"},
+                    new TestMessage {Data = "small 5"},
                 };
         };
 

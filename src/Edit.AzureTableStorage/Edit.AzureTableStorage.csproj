@@ -72,18 +72,18 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AppendOnlyStoreTableEntity.cs" />
+    <Compile Include="AppendOnlyStoreDynamicTableEntity.cs" />
     <Compile Include="AzureTableStorageAppendOnlyStore.cs" />
     <Compile Include="AzureTableStorageEntryDataVersion.cs" />
-    <Compile Include="AzureTableStorageFramer.cs" />
+    <Compile Include="Framer.cs" />
     <Compile Include="ChunkSerializer.cs" />
     <Compile Include="CloudTableExtensions.cs" />
-    <Compile Include="ColumnsWrapper.cs" />
     <Compile Include="DataColumn.cs" />
     <Compile Include="DataRow.cs" />
     <Compile Include="IChunkSerializer.cs" />
-    <Compile Include="MultipleRowsDataEntity.cs" />
+    <Compile Include="MultipleRowsDataEntityWriter.cs" />
     <Compile Include="IFramer.cs" />
+    <Compile Include="MultipleRowsDataEntityReader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
