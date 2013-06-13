@@ -38,6 +38,10 @@
     <Reference Include="Common.Logging.NLog20">
       <HintPath>Dependencies\Common.Logging\Common.Logging\Common.Logging.NLog20.dll</HintPath>
     </Reference>
+    <Reference Include="Edit, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>Dependencies\FooFighters\Edit\Edit.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Data.Edm, Version=5.4.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>Dependencies\Microsoft\OData\Microsoft.Data.Edm.dll</HintPath>
@@ -88,12 +92,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Edit\Edit.csproj">
-      <Project>{7328156f-f56e-4970-b50f-ac61920f171b}</Project>
-      <Name>Edit</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
