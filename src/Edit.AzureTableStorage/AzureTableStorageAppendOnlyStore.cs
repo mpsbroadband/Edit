@@ -72,6 +72,7 @@ namespace Edit.AzureTableStorage
                 azureDataVersion = expectedVersion as AzureTableStorageEntryDataVersion;
                 if (azureDataVersion == null)
                 {
+                    Logger.Warn("Illegal version");
                     throw new ConcurrencyException(streamName, expectedVersion);
                 }
                 version = azureDataVersion.Version;
@@ -93,6 +94,7 @@ namespace Edit.AzureTableStorage
                 }
                 else if ((noEntities == 2 && isNewEntity) || noEntities > 2) // We do not allow more than one updated row and one new row. The limitation is on the batch updated on the Azure Table Storage. At most it can insert/update 4 MB of data per batch
                 {
+                    Logger.Warn("Attempt to save more than max amount of new data");
                     throw new StorageSizeException("Cannot write new data that produces more than one new table row (about 1MB of new data)");
                 }
                 else // If more than 1 updated rows, the first is an updated row and the second a new row
@@ -133,7 +135,7 @@ namespace Edit.AzureTableStorage
             }
             catch (Exception ex)
             {
-                Logger.Error("ERROR " + ex);
+                Logger.Error("Error executing table batch " + ex);
                 throw;
             }
         }

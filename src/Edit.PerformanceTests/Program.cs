@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Diagnostics;
 using System.Net;
 using System.Threading.Tasks;
@@ -81,7 +82,8 @@ namespace Edit.PerformanceTests
 
         private async Task<IStreamStore> WireupEventStoreAsync()
         {
-            var cloudStorageAccount = CloudStorageAccount.DevelopmentStorageAccount;
+            //var cloudStorageAccount = CloudStorageAccount.DevelopmentStorageAccount;
+            var cloudStorageAccount = CloudStorageAccount.Parse(ConfigurationManager.AppSettings["StorageAccountConnectionString"]);
             AzureTableStorageAppendOnlyStore.IsStorageEmulator = true;
             return await AzureTableStorageAppendOnlyStore.CreateAsync(cloudStorageAccount, "performancetests", new JsonNetSerializer(new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.Objects }));
         }
