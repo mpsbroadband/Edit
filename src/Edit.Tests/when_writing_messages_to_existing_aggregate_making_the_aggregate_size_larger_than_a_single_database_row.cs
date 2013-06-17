@@ -7,16 +7,17 @@ namespace Edit.Tests
 {
     public class when_writing_messages_to_existing_aggregate_making_the_aggregate_size_larger_than_a_single_database_row
     {
-        protected static List<Chunk> chunkMessages = new List<Chunk>();
+        protected static List<Chunk> chunkMessages;
         protected static TestMessage lastWrittenMessage = new TestMessage { Data = "Last Message" };
         protected static ChunkSet readChunks;
-        protected static List<TestMessage> readMessages = new List<TestMessage>();
+        protected static List<TestMessage> readMessages;
         protected const int NoMessages = 8000; //2831;
 
         private Establish context = () =>
         {
             eventStore = Bootstrapper.WireupEventStore();
             var messages = TestMessage.CreateTestMessages(NoMessages);
+            chunkMessages = new List<Chunk>();
             foreach (var message in messages)
             {
                 chunkMessages.Add(new Chunk { Instance = message });
@@ -46,7 +47,7 @@ namespace Edit.Tests
 
         private Because of = () =>
         {
-
+            readMessages = new List<TestMessage>();
             var chunkset = eventStore.ReadAsync(streamName).Result;
 
             foreach (var chunk in chunkset.Chunks)

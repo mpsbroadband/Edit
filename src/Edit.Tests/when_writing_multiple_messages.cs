@@ -6,30 +6,31 @@ namespace Edit.Tests
 {
     public class when_writing_multiple_messages
     {
-        protected static List<TestMessage> writeMessages = new List<TestMessage>
+        protected static List<TestMessage> writeMessages;
+        protected static List<TestMessage> readMessages;
+
+        private Establish context = () =>
+        {
+            eventStore = Bootstrapper.WireupEventStore();
+            writeMessages = new List<TestMessage>
             {
                 new TestMessage() { Data = "First" }, 
                 new TestMessage() { Data = "Second" },
                 new TestMessage() { Data = "Third" }
             };
-        protected static List<TestMessage> readMessages = new List<TestMessage>();
-
-        private Establish context = () =>
-        {
-            eventStore = Bootstrapper.WireupEventStore();
-        };
-
-        private Because of = () =>
-        {
             List<Chunk> chunks = new List<Chunk>();
             foreach (var writeMessage in writeMessages)
             {
                 chunks.Add(new Chunk { Instance = writeMessage });
             }
 
-            var streamName = Guid.NewGuid().ToString();
+            streamName = Guid.NewGuid().ToString();
             eventStore.WriteAsync(streamName, chunks, null).Wait();
+        };
 
+        private Because of = () =>
+        {
+            readMessages = new List<TestMessage>();
             var chunkset = eventStore.ReadAsync(streamName).Result;
 
             foreach (var chunk in chunkset.Chunks)
@@ -52,5 +53,6 @@ namespace Edit.Tests
         };
 
         protected static IStreamStore eventStore;
+        protected static String streamName;
     }
 }
