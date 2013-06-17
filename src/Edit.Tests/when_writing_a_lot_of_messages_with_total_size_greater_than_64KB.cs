@@ -9,8 +9,8 @@ namespace Edit.Tests
 {
     public class when_writing_a_lot_of_messages_with_total_size_greater_than_64KB
     {
-        protected static List<TestMessage> aLotOfMessages = new List<TestMessage>();
-        protected static List<TestMessage> readMessages = new List<TestMessage>();
+        protected static List<TestMessage> aLotOfMessages;
+        protected static List<TestMessage> readMessages;
         protected const int NoMessages = 1000;
         private Establish context = () =>
         {
@@ -31,6 +31,7 @@ namespace Edit.Tests
 
             var chunkset = eventStore.ReadAsync(streamName).Result;
 
+            readMessages = new List<TestMessage>();
             foreach (var chunk in chunkset.Chunks)
             {
                 readMessages.Add(chunk.Instance as TestMessage);

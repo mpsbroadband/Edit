@@ -10,6 +10,8 @@ namespace Edit.Tests
     {
         public string Data { get; set; }
 
+        public byte[] PayLoad { get; set; } // Ability to set a size of the message
+
         public static List<TestMessage> CreateTestMessages(int noMessages)
         {
             var messages = new List<TestMessage>();

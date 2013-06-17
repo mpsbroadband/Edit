@@ -96,6 +96,7 @@
     <Compile Include="Bootstrapper.cs" />
     <Compile Include="can_write_and_read.cs" />
     <Compile Include="when_writing_a_combination_of_small_and_large_messages.cs" />
+    <Compile Include="when_writing_a_lot_of_transactions.cs" />
     <Compile Include="when_writing_messages_to_existing_aggregate_making_the_aggregate_size_larger_than_a_single_database_row.cs" />
     <Compile Include="when_writing_messages_with_total_size_greater_than_one_database_row_in_single_transaction.cs" />
     <Compile Include="when_writing_a_lot_of_messages_with_total_size_greater_than_64KB.cs" />

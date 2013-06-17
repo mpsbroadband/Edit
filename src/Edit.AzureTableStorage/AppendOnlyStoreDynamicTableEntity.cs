@@ -139,7 +139,20 @@ namespace Edit.AzureTableStorage
         {
             get
             {
-                return _columns.Select(dataColumn => dataColumn.GetNumberOfChunks()).Sum();
+                int total = 0;
+                foreach (var dataColumn in _columns)
+                {
+                    var currNo = dataColumn.GetNumberOfChunks();
+                    if (currNo > 0)
+                    {
+                        total += currNo;
+                    }
+                    else if (dataColumn.IsLastPieceOfMultipleColumnsChunk())
+                    {
+                        total++;
+                    }
+                }
+                return total;
             }
         }
 

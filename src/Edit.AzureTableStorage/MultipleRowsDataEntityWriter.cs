@@ -36,12 +36,14 @@ namespace Edit.AzureTableStorage
             var chunkEnum = chunks.GetEnumerator();
             int currChunkNo = 0;
             int currRowNo = FirstRowKey;
+            int firstChunkNo = currChunkNo;
             if (version != null)
             {
                 currRowNo = version.LastRowKey;
                 currChunkNo = FastForwardToFirstChunkInLastWrittenRow(currChunkNo, version.FirstChunkNoOfRow, chunkEnum);
+                firstChunkNo = version.FirstChunkNoOfRow;
             }
-            var currentRow = new DataRow(currChunkNo, currRowNo);
+            var currentRow = new DataRow(firstChunkNo, currRowNo);
             try
             {
                 while (chunkEnum.MoveNext())
