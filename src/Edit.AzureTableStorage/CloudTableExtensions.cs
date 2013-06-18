@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading;
+using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
 using System.Threading.Tasks;
 
@@ -49,6 +52,63 @@ namespace Edit.AzureTableStorage
         {
             var insertOperation = TableOperation.Replace(tableEntity);
             await cloudTable.ExecuteAsync(insertOperation);
+        }
+
+        public static async Task<IList<T>> RetrieveMultipleAsync<T>(this CloudTable cloudTable, string partitionKey, string excludeRowKey = null) where T : ITableEntity, new()
+        {
+            TableQuery<T> query;
+            if (excludeRowKey != null)
+            {
+                query = new TableQuery<T>().Where(
+                    TableQuery.CombineFilters(
+                        TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, partitionKey),
+                        TableOperators.And,
+                        TableQuery.GenerateFilterCondition("RowKey", QueryComparisons.NotEqual, excludeRowKey)));
+            }
+            else
+            {
+                query = new TableQuery<T>().Where(
+                    TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, partitionKey)
+                );                
+            }
+
+            return await ExecuteQueryAsync(cloudTable, query);
+        }
+
+        public static async Task<IList<T>> ExecuteQueryAsync<T>(
+            this CloudTable table,
+            TableQuery<T> query,
+            CancellationToken ct = default(CancellationToken),
+            Action<IList<T>> onProgress = null)
+            where T : ITableEntity, new()
+        {
+            var items = new List<T>();
+
+            TableContinuationToken token = null;
+
+            do
+            {
+                TableQuerySegment<T> seg = await table.ExecuteQueryAsync(query, token, ct);
+                token = seg.ContinuationToken;
+                items.AddRange(seg);
+                if (onProgress != null)
+                    onProgress(items);
+            } while (token != null && !ct.IsCancellationRequested);
+
+            return items;
+        }
+
+        public static Task<TableQuerySegment<T>> ExecuteQueryAsync<T>(
+            this CloudTable table,
+            TableQuery<T> query,
+            TableContinuationToken token,
+            CancellationToken ct = default(CancellationToken))
+            where T : ITableEntity, new()
+        {
+            ICancellableAsyncResult ar = table.BeginExecuteQuerySegmented(query, token, null, null);
+            ct.Register(ar.Cancel);
+
+            return Task.Factory.FromAsync<TableQuerySegment<T>>(ar, table.EndExecuteQuerySegmented<T>);
         }
 
     }

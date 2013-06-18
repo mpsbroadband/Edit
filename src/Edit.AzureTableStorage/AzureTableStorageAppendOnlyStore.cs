@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Common.Logging;
@@ -14,20 +15,28 @@ namespace Edit.AzureTableStorage
         private CloudStorageAccount _cloudStorageAccount;
         private string _tableName;
         private readonly IFramer _framer;
+        private readonly IEntitiesReader _entitiesReader;
 
         /// <summary>
         /// When running the storage emulator the maximum storage per database row is less than in product
         /// </summary>
         public static bool IsStorageEmulator { get; set; }
 
-        internal AzureTableStorageAppendOnlyStore(IFramer framer)
+        internal AzureTableStorageAppendOnlyStore(IFramer framer, IEntitiesReader entitiesReader)
         {
             _framer = framer;
+            _entitiesReader = entitiesReader;
         }
 
-        public static async Task<IStreamStore> CreateAsync(CloudStorageAccount cloudStorageAccount, string tableName, ISerializer serializer)
+        public static async Task<IStreamStore> CreateAsync(CloudStorageAccount cloudStorageAccount, string tableName,
+                                                           ISerializer serializer)
         {
-            var streamStore = new AzureTableStorageAppendOnlyStore(new Framer(serializer));
+            return await CreateAsync(cloudStorageAccount, tableName, serializer, new MultipleRetrieveEntitiesReader());
+        }
+
+        public static async Task<IStreamStore> CreateAsync(CloudStorageAccount cloudStorageAccount, string tableName, ISerializer serializer, IEntitiesReader entitiesReader)
+        {
+            var streamStore = new AzureTableStorageAppendOnlyStore(new Framer(serializer), entitiesReader);
             await streamStore.StartAsync(cloudStorageAccount, tableName);
             return streamStore;
         }
@@ -122,11 +131,7 @@ namespace Edit.AzureTableStorage
 
             try
             {
-                var result = cloudTable.ExecuteBatchAsync(tableBatch).Result;
-                foreach (var tableResult in result)
-                {
-                    var tmp = tableResult.HttpStatusCode;
-                }
+                await cloudTable.ExecuteBatchAsync(tableBatch);
             }
             catch (StorageException e)
             {
@@ -202,34 +207,16 @@ namespace Edit.AzureTableStorage
 
             try
             {
-                var entities = new List<AppendOnlyStoreDynamicTableEntity>();
-                int currRowKey = MultipleRowsDataEntityWriter.FirstRowKey;
-                Logger.DebugFormat("BEGIN: Retrieve cloud table entity async id: '{0}', thread: '{1}'", streamName, Thread.CurrentThread.ManagedThreadId);
-                var entity = await cloudTable.RetrieveAsync(streamName, currRowKey.ToString());
-                //var entity = await cloudTable.RetrieveAsync<DynamicTableEntity>(streamName, currRowKey.ToString());
-                Logger.DebugFormat("END: Retrieve cloud table entity async id: '{0}', thread: '{1}'", streamName, Thread.CurrentThread.ManagedThreadId);
-
-                if (entity == null)
+                var entities = await _entitiesReader.ReadRows(cloudTable, streamName);
+                if (entities == null || entities.Count == 0)
                 {
                     Logger.InfoFormat("No entity was found with stream name '{0}'", streamName);
                     isMissing = true;
                 }
                 else
                 {
-                    AppendOnlyStoreDynamicTableEntity lastEntity = AppendOnlyStoreDynamicTableEntity.Parse(entity);
-                    entities.Add(lastEntity);
-                    while (lastEntity != null && lastEntity.IsFull)
-                    {
-                        currRowKey++;
-                        entity = await cloudTable.RetrieveAsync(streamName, currRowKey.ToString());
-                        //entity = await cloudTable.RetrieveAsync<DynamicTableEntity>(streamName, currRowKey.ToString());
-                        if (entity != null)
-                        {
-                            lastEntity = AppendOnlyStoreDynamicTableEntity.Parse(entity);
-                            entities.Add(lastEntity);
-                        }
-                    }
                     var chunks = _framer.Read<Chunk>(entities);
+                    var lastEntity = entities.Last();
                     return new ChunkSet(chunks, new AzureTableStorageEntryDataVersion { Version = lastEntity.ETag, LastRowKey = int.Parse(lastEntity.RowKey), FirstChunkNoOfRow = lastEntity.FirstChunkNoWrittenToRow });
                 }
             }

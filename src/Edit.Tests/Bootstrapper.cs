@@ -11,7 +11,10 @@ namespace Edit.Tests
         {
             var cloudStorageAccount = CloudStorageAccount.DevelopmentStorageAccount;
             AzureTableStorageAppendOnlyStore.IsStorageEmulator = true;
-            return AzureTableStorageAppendOnlyStore.CreateAsync(cloudStorageAccount, "assumptions", new JsonNetSerializer(new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.Objects })).Result;
+            return AzureTableStorageAppendOnlyStore.CreateAsync(
+                cloudStorageAccount, 
+                "assumptions", 
+                new JsonNetSerializer(new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.Objects })).Result;
             //var tableStore = AzureTableStorageAppendOnlyStore.CreateAsync(cloudStorageAccount, "assumptions").Result;
             //return new StreamStore(tableStore, new JsonNetSerializer(new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.Objects }));
         }

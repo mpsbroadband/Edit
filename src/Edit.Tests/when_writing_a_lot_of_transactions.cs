@@ -1,9 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Edit.AzureTableStorage;
 using Machine.Specifications;
 
 namespace Edit.Tests
@@ -11,6 +7,7 @@ namespace Edit.Tests
     public class when_writing_a_lot_of_transactions
     {
         protected static List<TestMessage> writeMessages = new List<TestMessage>();
+        private static readonly byte[] PayLoad = new byte[1024 * 50]; // Each message has a 50 KB payload
         private const int NoTransactions = 20;
 
         private Establish context = () =>
@@ -18,11 +15,11 @@ namespace Edit.Tests
             eventStore = Bootstrapper.WireupEventStore();
             writeMessages = TestMessage.CreateTestMessages(NoTransactions);
             streamName = Guid.NewGuid().ToString();
-            List<Chunk> chunks = new List<Chunk>();
+            var chunks = new List<Chunk>();
             ChunkSet readChunks = null;
-            foreach (TestMessage message in writeMessages)
+            foreach (var message in writeMessages)
             {
-                message.PayLoad = new byte[1024*50]; // Each message has a 50 KB payload
+                message.PayLoad = PayLoad;
                 chunks.Add(new Chunk { Instance = message });
                 var version = readChunks == null ? null : readChunks.Version;
                 eventStore.WriteAsync(streamName, chunks, version).Wait();
