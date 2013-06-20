@@ -1,22 +1,14 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Diagnostics;
-using System.Linq;
-using System.Net;
-using System.Text;
 using System.Threading.Tasks;
-using Edit.AzureTableStorage;
-using Edit.JsonNet;
-using Microsoft.WindowsAzure.Storage;
-using Newtonsoft.Json;
 
 namespace Edit.PerformanceTests
 {
-    public class ReadAndWriteTest
+    public class ReadAndWriteTest : ITest
     {
-        private static readonly List<Guid> _ids = new List<Guid>();
+        private static readonly List<Guid> Ids = new List<Guid>();
 
         const int NumberOfInsertions = 1000;
 
@@ -34,13 +26,13 @@ namespace Edit.PerformanceTests
             {
                 var e = new CreatedCustomer(Guid.NewGuid(), "Edit");
 
-                var task = eventStore.WriteAsync(e.Id.ToString(), new List<Chunk>()
+                var task = eventStore.WriteAsync(e.Id.ToString(), new List<Chunk>
                     {
-                        new Chunk() {Instance = e}
+                        new Chunk {Instance = e}
                     }, null);
                 tasks.Enqueue(task);
 
-                _ids.Add(e.Id);
+                Ids.Add(e.Id);
             }
 
             await Task.WhenAll(tasks);
@@ -55,7 +47,7 @@ namespace Edit.PerformanceTests
             Console.WriteLine("Running {0} reads", NumberOfInsertions);
             stopWatch.Start();
 
-            foreach (var id in _ids)
+            foreach (var id in Ids)
             {
                 var task = eventStore.ReadAsync(id.ToString());
                 tasks.Enqueue(task);

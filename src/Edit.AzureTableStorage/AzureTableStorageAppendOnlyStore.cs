@@ -41,6 +41,13 @@ namespace Edit.AzureTableStorage
             return streamStore;
         }
 
+        public static async Task<IStreamStore> CreateAsync(CloudStorageAccount cloudStorageAccount, string tableName, IFramer framer, IEntitiesReader entitiesReader)
+        {
+            var streamStore = new AzureTableStorageAppendOnlyStore(framer, entitiesReader);
+            await streamStore.StartAsync(cloudStorageAccount, tableName);
+            return streamStore;
+        }
+
         private async Task StartAsync(CloudStorageAccount cloudStorageAccount, string tableName)
         {
             _cloudStorageAccount = cloudStorageAccount;
@@ -127,7 +134,7 @@ namespace Edit.AzureTableStorage
 
             var tableBatch = new TableBatchOperation();
             tableBatch.Replace(entityToUpdate);
-            tableBatch.Insert(entityToInsert);
+            tableBatch.InsertOrReplace(entityToInsert);
 
             try
             {

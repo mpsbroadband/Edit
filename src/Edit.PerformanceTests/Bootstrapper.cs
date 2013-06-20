@@ -1,4 +1,5 @@
-﻿using System.Configuration;
+﻿using System;
+using System.Configuration;
 using System.Threading.Tasks;
 using Edit.AzureTableStorage;
 using Edit.JsonNet;
@@ -11,15 +12,17 @@ namespace Edit.PerformanceTests
     {
         public static Task<IStreamStore> WireupEventStoreAsync()
         {
-            return WireupEventStoreAsync(new MultipleRetrieveEntitiesReader());
+            return WireupEventStoreAsync(new MultipleRetrieveEntitiesReader(), new Framer(new JsonNetSerializer(new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Objects })));
         }
 
-        public static async Task<IStreamStore> WireupEventStoreAsync(IEntitiesReader entitiesReader)
+        public static async Task<IStreamStore> WireupEventStoreAsync(IEntitiesReader entitiesReader, IFramer framer)
         {
             //var cloudStorageAccount = CloudStorageAccount.DevelopmentStorageAccount;
-            var cloudStorageAccount = CloudStorageAccount.Parse(ConfigurationManager.AppSettings["StorageAccountConnectionString"]);
+            string connectionString = ConfigurationManager.AppSettings["StorageAccountConnectionString"];
+            var cloudStorageAccount = CloudStorageAccount.Parse(connectionString);
+            AzureTableStorageAppendOnlyStore.IsStorageEmulator = connectionString.Equals("UseDevelopmentStorage=true", StringComparison.OrdinalIgnoreCase);
             //AzureTableStorageAppendOnlyStore.IsStorageEmulator = true;
-            return await AzureTableStorageAppendOnlyStore.CreateAsync(cloudStorageAccount, "performancetests", new JsonNetSerializer(new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.Objects }));
+            return await AzureTableStorageAppendOnlyStore.CreateAsync(cloudStorageAccount, "performancetests", framer, entitiesReader);
         }
 
     }

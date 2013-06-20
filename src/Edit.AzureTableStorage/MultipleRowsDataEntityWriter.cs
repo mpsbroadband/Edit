@@ -3,7 +3,7 @@ using Microsoft.WindowsAzure.Storage.Table;
 
 namespace Edit.AzureTableStorage
 {
-    internal class MultipleRowsDataEntityWriter
+    public class MultipleRowsDataEntityWriter
     {
         private readonly IChunkSerializer _serializer;
 
@@ -74,9 +74,9 @@ namespace Edit.AzureTableStorage
             return WriteChunksToEntity(chunks);
         }
 
-        public IEnumerable<AppendOnlyStoreDynamicTableEntity> GetUpdatedDataRows<T>(IEnumerable<T> chunks, AzureTableStorageEntryDataVersion version) where T : class
+        public IEnumerable<AppendOnlyStoreDynamicTableEntity> GetUpdatedDataRows<T>(IEnumerable<T> chunks, IStoredDataVersion version) where T : class
         {
-            return WriteChunksToEntity(chunks, version);
+            return WriteChunksToEntity(chunks, version as AzureTableStorageEntryDataVersion);
         }
 
         public IEnumerable<T> GetChunks<T>(IEnumerable<ITableEntity> tableRows) where T : class

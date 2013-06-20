@@ -92,10 +92,13 @@
   <ItemGroup>
     <Compile Include="Bootstrapper.cs" />
     <Compile Include="CreatedCustomer.cs" />
+    <Compile Include="DummyReadFramer.cs" />
+    <Compile Include="ITest.cs" />
     <Compile Include="MultipleRowReadTest.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReadAndWriteTest.cs" />
+    <Compile Include="WritingAndReadingLargeAggregatesTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
