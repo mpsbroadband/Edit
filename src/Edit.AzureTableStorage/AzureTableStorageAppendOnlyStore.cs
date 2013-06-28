@@ -165,9 +165,9 @@ namespace Edit.AzureTableStorage
             }
             catch (StorageException e)
             {
-                if (e.RequestInformation.HttpStatusCode == 409 || e.RequestInformation.HttpStatusCode == 412) // 409 == Conflict
+                if (e.RequestInformation.HttpStatusCode == 409 || e.RequestInformation.HttpStatusCode == 412) // 409 == Conflict, 412 == Preconfition Failed
                 {
-                    Logger.Error(String.Format("Storage concurrency exception HttpStatusCode:{0} HttpStatusMessage:{1} Etag:{2} expectedVersion:{3} error:{4} RequestInfo.Error:{5} ExtendedErrorInfo:{6} MD5:{7} EndTime:{8}", e.RequestInformation.HttpStatusCode, e.RequestInformation.HttpStatusMessage, e.RequestInformation.Etag, expectedVersion, e, e.RequestInformation.Exception, e.RequestInformation.ExtendedErrorInformation, e.RequestInformation.ContentMd5, e.RequestInformation.EndTime));
+                    Logger.DebugFormat("Storage concurrency exception {0}", e);
                     throw new ConcurrencyException(streamName, expectedVersion);
                 }
                 else if (e.RequestInformation.HttpStatusCode == 404)
