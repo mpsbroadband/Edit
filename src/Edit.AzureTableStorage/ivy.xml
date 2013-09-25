@@ -7,8 +7,6 @@
   </publications>
   <dependencies>
     <dependency org="FooFighters" name="Edit" rev="latest.integration" />
-	<dependency org="Microsoft" name="WindowsAzureStorage" rev="2.0+" />
-	<dependency org="Microsoft" name="DataServicesClient" rev="5.4+" />
-	<dependency org="Microsoft" name="OData" rev="5.4+" />
+	<dependency org="Microsoft" name="WindowsAzureStorage" rev="2.1+" />
   </dependencies>  
 </ivy-module>
