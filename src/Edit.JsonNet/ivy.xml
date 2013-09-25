@@ -7,6 +7,6 @@
   </publications>
   <dependencies>
     <dependency org="FooFighters" name="Edit" rev="latest.integration" />
-	<dependency org="JsonNet" name="JsonNet" rev="4.5+" />
+	<dependency org="JsonNet" name="JsonNet" rev="5.0+" />
   </dependencies>  
 </ivy-module>
