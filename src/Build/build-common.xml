@@ -32,6 +32,7 @@
 
 	<target name="build-dotnet" depends="transform-assemlbyinfo">
 		<exec executable="C:\Windows\Microsoft.NET\Framework\v4.0.30319\MSBuild.exe" failonerror="true">
+			<arg value="/t:rebuild" />
 			<arg value="/ignoreprojectextensions:.sln" />
 			<arg value="/property:OutputPath=${output.dir}\" />
 		</exec>
