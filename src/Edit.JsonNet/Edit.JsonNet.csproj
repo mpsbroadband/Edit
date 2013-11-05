@@ -32,24 +32,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Common.Logging">
-      <HintPath>Dependencies\Common.Logging\Common.Logging\Common.Logging.dll</HintPath>
-    </Reference>
-    <Reference Include="Common.Logging.NLog20">
-      <HintPath>Dependencies\Common.Logging\Common.Logging\Common.Logging.NLog20.dll</HintPath>
-    </Reference>
-    <Reference Include="Edit, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>Dependencies\FooFighters\Edit\Edit.dll</HintPath>
-    </Reference>
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>Dependencies\JsonNet\JsonNet\Newtonsoft.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="NLog">
-      <HintPath>Dependencies\NLog\NLog\NLog.dll</HintPath>
-    </Reference>
     <Reference Include="System.Core" />
     <Reference Include="System.Xml" />
+    <Reference Include="Newtonsoft.Json">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Newtonsoft.Json\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="JsonNetSerializer.cs" />

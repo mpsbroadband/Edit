@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+    <metadata>
+        <id>Edit.AzureTableStorage</id>
+        <version>1.0.0</version>
+        <authors>MPS Broadband AB</authors>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description></description>
+	    <dependencies>
+			<dependency id="Common.Logging" version="[2.1.2]" />
+			<dependency id="WindowsAzure.Storage" version="[2.1.0.3]" />
+	    </dependencies>
+    </metadata>
+	<files>
+		<file src="Target\bin\Edit.AzureTableStorage.dll" target="lib\net45" />
+		<file src="Target\bin\Edit.AzureTableStorage.pdb" target="lib\net45" />
+	</files>
+</package>
