@@ -5,13 +5,13 @@
         <version>1.0.0</version>
         <authors>MPS Broadband AB</authors>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
-        <description></description>
+        <description>Edit.JsonNet</description>
 	    <dependencies>
 			<dependency id="Newtonsoft.Json" version="[5.0.8]" />
 	    </dependencies>
     </metadata>
 	<files>
-		<file src="Target\bin\Edit.JsonNet.dll" target="lib\net45" />
-		<file src="Target\bin\Edit.JsonNet.pdb" target="lib\net45" />
+		<file src="Edit.JsonNet.dll" target="lib\net45" />
+		<file src="Edit.JsonNet.pdb" target="lib\net45" />
 	</files>
 </package>

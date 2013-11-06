@@ -5,14 +5,14 @@
         <version>1.0.0</version>
         <authors>MPS Broadband AB</authors>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
-        <description></description>
+        <description>Edit.AzureTableStorage</description>
 	    <dependencies>
 			<dependency id="Common.Logging" version="[2.1.2]" />
 			<dependency id="WindowsAzure.Storage" version="[2.1.0.3]" />
 	    </dependencies>
     </metadata>
 	<files>
-		<file src="Target\bin\Edit.AzureTableStorage.dll" target="lib\net45" />
-		<file src="Target\bin\Edit.AzureTableStorage.pdb" target="lib\net45" />
+		<file src="Edit.AzureTableStorage.dll" target="lib\net45" />
+		<file src="Edit.AzureTableStorage.pdb" target="lib\net45" />
 	</files>
 </package>

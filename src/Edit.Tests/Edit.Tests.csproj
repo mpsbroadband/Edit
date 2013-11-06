@@ -49,6 +49,34 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Machine.Specifications\lib\net40\Machine.Specifications.TDNetRunner.dll</HintPath>
     </Reference>
+    <Reference Include="Common.Logging">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Common.Logging\lib\net40\Common.Logging.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Data.Edm">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.Data.Edm\lib\net40\Microsoft.Data.Edm.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Data.OData">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.Data.OData\lib\net40\Microsoft.Data.OData.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.WindowsAzure.Configuration">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.WindowsAzure.ConfigurationManager\lib\net35-full\Microsoft.WindowsAzure.Configuration.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Spatial">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\System.Spatial\lib\net40\System.Spatial.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.WindowsAzure.Storage">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\WindowsAzure.Storage\lib\net40\Microsoft.WindowsAzure.Storage.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Newtonsoft.Json\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Bootstrapper.cs" />
@@ -65,7 +93,18 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="app.config" />
+    <ProjectReference Include="..\Edit.AzureTableStorage\Edit.AzureTableStorage.csproj">
+      <Project>{8829a41b-c0b5-45b1-8119-406b7da74ecf}</Project>
+      <Name>Edit.AzureTableStorage</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Edit.JsonNet\Edit.JsonNet.csproj">
+      <Project>{05987028-7355-4324-9cc8-dca8a6fd81db}</Project>
+      <Name>Edit.JsonNet</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Edit\Edit.csproj">
+      <Project>{7328156f-f56e-4970-b50f-ac61920f171b}</Project>
+      <Name>Edit</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

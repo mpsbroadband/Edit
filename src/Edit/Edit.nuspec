@@ -5,12 +5,12 @@
         <version>1.0.0</version>
         <authors>MPS Broadband AB</authors>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
-        <description></description>
+        <description>Edit</description>
 	    <dependencies>
 	    </dependencies>
     </metadata>
 	<files>
-		<file src="Target\bin\Edit.dll" target="lib\net45" />
-		<file src="Target\bin\Edit.pdb" target="lib\net45" />
+		<file src="Edit.dll" target="lib\net45" />
+		<file src="Edit.pdb" target="lib\net45" />
 	</files>
 </package>

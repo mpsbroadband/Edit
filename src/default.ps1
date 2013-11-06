@@ -5,12 +5,13 @@ Properties {
 	$TargetsDir = "Target"
 	$OutDir = "$TargetsDir\bin"
 	$Configuration = "Debug"
+	$Platform = "Any CPU"
 	$LocalRepository = ($env:LOCALAPPDATA + "\.bacon")
 	$Version = (Get-Date -Format "yyyyMMdd.HHmm.ss")
 	[string[]]$Repositories = $LocalRepository, "https://packages.nuget.org/api/v2"
 }
 
-Task Default -Depends Init, Restore, Build, Publish
+Task Default -Depends Test
 
 Task Init {
 	Write-Host "Solution:`t$SolutionFile" -ForegroundColor Gray
@@ -28,14 +29,24 @@ Task Clean -Depends Init {
 	}
 }
 
-Task Build -Depends Init {
-   Exec { msbuild $SolutionFile /t:Build /p:Configuration=$Configuration /v:Quiet /p:OutDir=$OutDir }
-}
-
 Task Restore -Depends Init {
     Restore-Solution -SolutionFile $SolutionFile -Repositories $Repositories | Out-Null
 }
 
-Task Publish -Depends Init {
-	Package-Solution -SolutionFile $SolutionFile -Version $Version -DestinationDirectory $env:TEMP | Publish-Package -Repository $LocalRepository -DeleteSource | Out-Null
+Task Build -Depends Restore {
+   Exec { msbuild $SolutionFile /p:Configuration=$Configuration /p:Platform=$Platform /p:OutDir=$OutDir /p:OutputPath=$OutDir }
+}
+
+Task Test -Depends Build {
+	Get-ChildItem -Recurse -Include "*Tests.dll" | ForEach-Object { 
+		$file = $_
+		
+		if ($file.FullName.Contains($OutDir)) {
+			exec { packages\Machine.Specifications\tools\mspec-clr4.exe $file.FullName }
+		}
+	}
+}
+
+Task Publish -Depends Test {
+	Package-Solution -SolutionFile $SolutionFile -Version $Version -DestinationDirectory $env:TEMP -FilesBaseDirectory $OutDir | Publish-Package -Repository $LocalRepository -DeleteSource | Out-Null
 }

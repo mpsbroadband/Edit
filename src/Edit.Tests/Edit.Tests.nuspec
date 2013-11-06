@@ -5,13 +5,13 @@
         <version>1.0.0</version>
         <authors>MPS Broadband AB</authors>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
-        <description></description>
+        <description>Edit.Tests</description>
 	    <dependencies>
 			<dependency id="Machine.Specifications" version="[0.5.16]" />
 	    </dependencies>
     </metadata>
 	<files>
-		<file src="Target\bin\Edit.Tests.dll" target="lib\net45" />
-		<file src="Target\bin\Edit.Tests.pdb" target="lib\net45" />
+		<file src="Edit.Tests.dll" target="lib\net45" />
+		<file src="Edit.Tests.pdb" target="lib\net45" />
 	</files>
 </package>
