@@ -1,4 +1,5 @@
 Import-Module .\Build\Bacon.dll -DisableNameChecking
+Import-Module .\Build\teamcity.psm1 -DisableNameChecking
 
 Properties {
 	$SolutionFile = "Edit.sln"
@@ -6,17 +7,34 @@ Properties {
 	$OutDir = "$TargetsDir\bin"
 	$Configuration = "Debug"
 	$Platform = "Any CPU"
+	$BuildCounter = $null
 	$LocalRepository = ($env:LOCALAPPDATA + "\.bacon")
-	$Version = (Get-Date -Format "yyyyMMdd.HHmm.ss")
-	[string[]]$Repositories = $LocalRepository, "https://packages.nuget.org/api/v2"
+	$BuildRepository = "http://build.mpsdev.com/httpAuth/app/nuget/v1/FeedService.svc/"
+	[string[]]$Repositories = $LocalRepository, $BuildRepository, "https://packages.nuget.org/api/v2"
 }
 
 Task Default -Depends Test
 
+if ($env:TEAMCITY_VERSION) {
+	TaskSetup {
+		TeamCity-ReportBuildProgress "Running task $($psake.context.Peek().currentTaskName)"
+	}
+}
+
 Task Init {
+	if ($BuildCounter -eq $null) {
+		$script:Version = (Get-Date -Format "yyyyMMdd.HHmm.ss")
+	} else {
+		$script:Version = "1.0.$BuildCounter"
+	}
+	
 	Write-Host "Solution:`t$SolutionFile" -ForegroundColor Gray
 	Write-Host "Configuration:`t$Configuration" -ForegroundColor Gray
 	Write-Host "Version:`t$Version" -ForegroundColor Gray
+	
+	if ($env:TEAMCITY_VERSION) {
+		TeamCity-SetBuildNumber $Version
+	}
 }
 
 Task Clean -Depends Init {
