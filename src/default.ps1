@@ -10,6 +10,7 @@ Properties {
 	$BuildCounter = $null
 	$LocalRepository = ($env:LOCALAPPDATA + "\.bacon")
 	$BuildRepository = "http://build.mpsdev.com/httpAuth/app/nuget/v1/FeedService.svc/"
+	$SkipTests = $false
 	[string[]]$Repositories = $LocalRepository, $BuildRepository, "https://packages.nuget.org/api/v2"
 }
 
@@ -31,7 +32,7 @@ Task Init {
 	Write-Host "Solution:`t$SolutionFile" -ForegroundColor Gray
 	Write-Host "Configuration:`t$Configuration" -ForegroundColor Gray
 	Write-Host "Version:`t$Version" -ForegroundColor Gray
-	
+
 	if ($env:TEAMCITY_VERSION) {
 		TeamCity-SetBuildNumber $Version
 	}
@@ -55,7 +56,7 @@ Task Build -Depends Restore {
    Exec { msbuild $SolutionFile /p:Configuration=$Configuration /p:Platform=$Platform /p:OutDir=$OutDir /p:OutputPath=$OutDir }
 }
 
-Task Test -Depends Build {
+Task Test -Depends Build -Precondition { return $SkipTests -ne $true } {
 	Get-ChildItem -Recurse -Include "*Tests.dll" | ForEach-Object { 
 		$file = $_
 		
@@ -65,6 +66,6 @@ Task Test -Depends Build {
 	}
 }
 
-Task Publish -Depends Test {
+Task Publish -Depends Build, Test {
 	Package-Solution -SolutionFile $SolutionFile -Version $Version -DestinationDirectory $env:TEMP -FilesBaseDirectory $OutDir | Publish-Package -Repository $LocalRepository -DeleteSource | Out-Null
 }
