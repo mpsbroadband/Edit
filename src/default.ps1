@@ -4,9 +4,10 @@ Import-Module .\Build\teamcity.psm1 -DisableNameChecking
 Properties {
 	$SolutionFile = "Edit.sln"
 	$TargetsDir = "Target"
-	$OutDir = "$TargetsDir\bin"
+	$OutDir = "$TargetsDir\bin\"
 	$Configuration = "Debug"
 	$Platform = "Any CPU"
+	$TargetProfile = "Cloud"
 	$BuildCounter = $null
 	$LocalRepository = ($env:LOCALAPPDATA + "\.bacon")
 	$BuildRepository = "http://build.mpsdev.com/httpAuth/app/nuget/v1/FeedService.svc/"
@@ -53,7 +54,8 @@ Task Restore -Depends Init {
 }
 
 Task Build -Depends Restore {
-   Exec { msbuild $SolutionFile /p:Configuration=$Configuration /p:Platform=$Platform /p:OutDir=$OutDir /p:OutputPath=$OutDir }
+   Exec { msbuild $SolutionFile /t:Build /p:Configuration=$Configuration /p:TargetProfile=$TargetProfile /p:Platform=$Platform /p:OutDir=$OutDir /p:OutputPath=$OutDir }
+   Exec { msbuild $SolutionFile /t:Publish /p:Configuration=$Configuration /p:TargetProfile=$TargetProfile /p:Platform=$Platform /p:OutDir=$OutDir /p:OutputPath=$OutDir }
 }
 
 Task Test -Depends Build -Precondition { return $SkipTests -ne $true } {
