@@ -1,4 +1,4 @@
-Import-Module .\Build\Bacon.dll -DisableNameChecking
+Import-Module .\Build\bacon.psm1 -DisableNameChecking
 Import-Module .\Build\teamcity.psm1 -DisableNameChecking
 
 Properties {
@@ -12,6 +12,7 @@ Properties {
 	$LocalRepository = ($env:LOCALAPPDATA + "\.bacon")
 	$BuildRepository = "http://build.mpsdev.com/httpAuth/app/nuget/v1/FeedService.svc/"
 	$SkipTests = $false
+	$BaconDll = "$PSScriptRoot\Build\Bacon.dll"
 	[string[]]$Repositories = $LocalRepository, $BuildRepository, "https://packages.nuget.org/api/v2"
 }
 
@@ -37,6 +38,9 @@ Task Init {
 	if ($env:TEAMCITY_VERSION) {
 		TeamCity-SetBuildNumber $Version
 	}
+	
+	Bacon-Init $BuildRepository "MPS" $BaconDll
+	Import-Module $baconDll -DisableNameChecking -Scope Global
 }
 
 Task Clean -Depends Init {

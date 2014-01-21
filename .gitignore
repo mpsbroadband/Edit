@@ -169,3 +169,6 @@ Target/
 src/Build/*.InstallLog
 src/Build/*.InstallState
 !Build/
+Dependencies
+*.InstallLog
+*.InstallState
