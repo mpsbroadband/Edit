@@ -13,6 +13,7 @@ Properties {
 	$BuildRepository = "http://build.mpsdev.com/httpAuth/app/nuget/v1/FeedService.svc/"
 	$SkipTests = $false
 	$BaconDll = "$PSScriptRoot\Build\Bacon.dll"
+	$CachePackages = $true
 	[string[]]$Repositories = $LocalRepository, $BuildRepository, "https://packages.nuget.org/api/v2"
 }
 
@@ -54,7 +55,7 @@ Task Clean -Depends Init {
 }
 
 Task Restore -Depends Init {
-    Restore-Solution -SolutionFile $SolutionFile -Repositories $Repositories | Out-Null
+    Restore-Solution -SolutionFile $SolutionFile -Repositories $Repositories -CachePackages $CachePackages | Out-Null
 }
 
 Task Build -Depends Restore {
