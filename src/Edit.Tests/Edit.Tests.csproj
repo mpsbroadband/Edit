@@ -49,10 +49,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Machine.Specifications\lib\net40\Machine.Specifications.TDNetRunner.dll</HintPath>
     </Reference>
-    <Reference Include="Common.Logging">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Common.Logging\lib\net40\Common.Logging.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.Data.Edm">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Microsoft.Data.Edm\lib\net40\Microsoft.Data.Edm.dll</HintPath>
@@ -76,6 +72,10 @@
     <Reference Include="Newtonsoft.Json">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Newtonsoft.Json\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="NLog">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\NLog\lib\net45\NLog.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

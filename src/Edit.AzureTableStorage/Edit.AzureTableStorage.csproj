@@ -58,9 +58,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\WindowsAzure.Storage\lib\net40\Microsoft.WindowsAzure.Storage.dll</HintPath>
     </Reference>
-    <Reference Include="Common.Logging">
+    <Reference Include="NLog">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Common.Logging\lib\net40\Common.Logging.dll</HintPath>
+      <HintPath>..\packages\NLog\lib\net45\NLog.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

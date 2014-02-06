@@ -3,15 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Common.Logging;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
+using NLog;
 
 namespace Edit.AzureTableStorage
 {
     public sealed class AzureTableStorageAppendOnlyStore : IStreamStore, IDisposable
     {
-        private static readonly ILog Logger = LogManager.GetCurrentClassLogger();
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         private CloudStorageAccount _cloudStorageAccount;
         private string _tableName;
         private readonly IFramer _framer;
@@ -167,7 +167,7 @@ namespace Edit.AzureTableStorage
             {
                 if (e.RequestInformation.HttpStatusCode == 409 || e.RequestInformation.HttpStatusCode == 412) // 409 == Conflict, 412 == Preconfition Failed
                 {
-                    Logger.DebugFormat("Storage concurrency exception {0}", e);
+                    Logger.Debug("Storage concurrency exception {0}", e);
                     throw new ConcurrencyException(streamName, expectedVersion);
                 }
                 else if (e.RequestInformation.HttpStatusCode == 404)
@@ -218,7 +218,7 @@ namespace Edit.AzureTableStorage
                 var entities = await _entitiesReader.ReadRows(cloudTable, streamName);
                 if (entities == null || entities.Count == 0)
                 {
-                    Logger.InfoFormat("No entity was found with stream name '{0}'", streamName);
+                    Logger.Info("No entity was found with stream name '{0}'", streamName);
                     isMissing = true;
                 }
                 else
@@ -230,7 +230,7 @@ namespace Edit.AzureTableStorage
             }
             catch (StorageException exception)
             {
-                Logger.DebugFormat("ERROR: Exception {0} while retrieving cloud table entity async", exception);
+                Logger.Debug("ERROR: Exception {0} while retrieving cloud table entity async", exception);
 
                 if (exception.RequestInformation.HttpStatusCode != 404)
                 {
@@ -244,7 +244,7 @@ namespace Edit.AzureTableStorage
             {
                 //Logger.DebugFormat("BEGIN: Insert empty async: StreamName: '{0}'", streamName);
                 //await InsertEmptyAsync(streamName, timeout, token);
-                Logger.DebugFormat("Returning null");
+                Logger.Debug("Returning null");
                 return null;
                 //Logger.DebugFormat("END: Insert empty async: StreamName: '{0}'", streamName);
             }
@@ -270,7 +270,7 @@ namespace Edit.AzureTableStorage
             }
             catch (Exception ex)
             {
-                Logger.ErrorFormat("ERROR: Exception thrown while inserting empty on id {0}", ex, streamName);
+                Logger.ErrorException(string.Format("ERROR: Exception thrown while inserting empty on id {0}", streamName), ex);
             }
         }
 

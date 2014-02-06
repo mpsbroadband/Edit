@@ -2,22 +2,22 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Common.Logging;
 using Microsoft.WindowsAzure.Storage.Table;
+using NLog;
 
 namespace Edit.AzureTableStorage
 {
     public class RetrieveThenSingleQueryEntitiesReader : IEntitiesReader
     {
-        private static readonly ILog Logger = LogManager.GetCurrentClassLogger();
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
         public async Task<IList<AppendOnlyStoreDynamicTableEntity>> ReadRows(CloudTable cloudTable, string streamName)
         {
             var entities = new List<AppendOnlyStoreDynamicTableEntity>();
 
-            Logger.DebugFormat("BEGIN: Retrieve cloud table entity async id: '{0}', thread: '{1}'", streamName, Thread.CurrentThread.ManagedThreadId);
+            Logger.Debug("BEGIN: Retrieve cloud table entity async id: '{0}', thread: '{1}'", streamName, Thread.CurrentThread.ManagedThreadId);
             var entity = await cloudTable.RetrieveAsync(streamName, MultipleRowsDataEntityWriter.FirstRowKey.ToString());
-            Logger.DebugFormat("END: Retrieve cloud table entity async id: '{0}', thread: '{1}'", streamName, Thread.CurrentThread.ManagedThreadId);
+            Logger.Debug("END: Retrieve cloud table entity async id: '{0}', thread: '{1}'", streamName, Thread.CurrentThread.ManagedThreadId);
 
             if (entity == null)
             {
@@ -28,10 +28,10 @@ namespace Edit.AzureTableStorage
             entities.Add(firstEntitiy);
             if (firstEntitiy.IsFull)
             {
-                Logger.DebugFormat("BEGIN: Retrieve cloud table entities query async id: '{0}', thread: '{1}'", streamName, Thread.CurrentThread.ManagedThreadId);
+                Logger.Debug("BEGIN: Retrieve cloud table entities query async id: '{0}', thread: '{1}'", streamName, Thread.CurrentThread.ManagedThreadId);
                 var allRemainingEntities = await cloudTable.RetrieveMultipleAsync<DynamicTableEntity>(streamName,
                                                                                     entity.RowKey);
-                Logger.DebugFormat("END: Retrieve cloud table entities query async id: '{0}', thread: '{1}'", streamName, Thread.CurrentThread.ManagedThreadId);
+                Logger.Debug("END: Retrieve cloud table entities query async id: '{0}', thread: '{1}'", streamName, Thread.CurrentThread.ManagedThreadId);
                 entities.AddRange(allRemainingEntities.Select(AppendOnlyStoreDynamicTableEntity.Parse));
             }
 
