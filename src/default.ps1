@@ -4,6 +4,7 @@ Import-Module .\Build\teamcity.psm1 -DisableNameChecking
 Properties {
 	$SolutionFile = "Edit.sln"
 	$TargetsDir = "Target"
+	$PackagesDir = "packages"
 	$OutDir = "$TargetsDir\bin\"
 	$Configuration = "Debug"
 	$Platform = "Any CPU"
@@ -13,8 +14,7 @@ Properties {
 	$BuildRepository = "http://build.mpsdev.com/httpAuth/app/nuget/v1/FeedService.svc/"
 	$SkipTests = $false
 	$BaconDll = "$PSScriptRoot\Build\Bacon.dll"
-	$CachePackages = $true
-	[string[]]$Repositories = $LocalRepository, $BuildRepository, "https://packages.nuget.org/api/v2"
+	[string[]]$RemoteRepositories = $BuildRepository, "https://packages.nuget.org/api/v2"
 }
 
 Task Default -Depends Test
@@ -52,10 +52,14 @@ Task Clean -Depends Init {
 	if (Test-Path $TargetsDir) {
 		Remove-Item -Recurse -Force $TargetsDir 
 	}
+	
+	if (Test-Path $PackagesDir) {
+		Remove-Item -Recurse -Force $PackagesDir 
+	}
 }
 
 Task Restore -Depends Init {
-    Restore-Solution -SolutionFile $SolutionFile -Repositories $Repositories -CachePackages $CachePackages | Out-Null
+    Restore-Solution -SolutionFile $SolutionFile -LocalRepository $LocalRepository -RemoteRepositories $RemoteRepositories | Out-Null
 }
 
 Task Build -Depends Restore {
@@ -64,11 +68,17 @@ Task Build -Depends Restore {
 }
 
 Task Test -Depends Build -Precondition { return $SkipTests -ne $true } {
+	$mspec = (Get-ChildItem -Recurse -Include "mspec-clr4.exe")[0]
+	
+	if ($mspec -eq $null) {
+		throw "Could not locate mspec."
+	}
+	
 	Get-ChildItem -Recurse -Include "*Tests.dll" | ForEach-Object { 
 		$file = $_
 		
 		if ($file.FullName.Contains($OutDir)) {
-			exec { packages\Machine.Specifications\tools\mspec-clr4.exe $file.FullName }
+			exec { & $mspec $file }
 		}
 	}
 }
