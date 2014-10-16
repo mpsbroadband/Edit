@@ -32,7 +32,7 @@ namespace Edit.Tests
             var chunkset = eventStore.ReadAsync(streamName).Result;
 
             readMessages = new List<TestMessage>();
-            foreach (var chunk in chunkset.Chunks)
+            foreach (var chunk in chunkset.Items)
             {
                 readMessages.Add(chunk.Instance as TestMessage);
             }

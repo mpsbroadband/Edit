@@ -50,7 +50,7 @@ namespace Edit.Tests
         private It the_messages_read_should_be_the_same = () =>
             {
                 int cnt = 0;
-                foreach (var chunk in _chunkset.Chunks)
+                foreach (var chunk in _chunkset.Items)
                 {
                     writeMessages[cnt].Data.ShouldEqual((chunk.Instance as TestMessage).Data);
                     cnt++;
@@ -59,6 +59,6 @@ namespace Edit.Tests
 
         protected static IStreamStore eventStore;
         protected static Exception exception;
-        protected static ChunkSet _chunkset;
+        protected static StreamSegment<> _chunkset;
     }
 }

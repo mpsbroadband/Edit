@@ -37,13 +37,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Chunk.cs" />
-    <Compile Include="ChunkSet.cs" />
+    <Compile Include="StreamSegment.cs" />
     <Compile Include="ConcurrencyException.cs" />
     <Compile Include="CorruptedStorageException.cs" />
-    <Compile Include="IStoredDataVersion.cs" />
+    <Compile Include="ISnapshotStore.cs" />
+    <Compile Include="IVersion.cs" />
     <Compile Include="IStreamStore.cs" />
     <Compile Include="ISerializer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SnapshotEnvelope.cs" />
     <Compile Include="StorageSizeException.cs" />
     <Compile Include="TaskExtensions.cs" />
   </ItemGroup>

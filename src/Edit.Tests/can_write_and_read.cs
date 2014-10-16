@@ -42,7 +42,7 @@ namespace Edit.Tests
                 eventStore.WriteAsync(streamName, chunks, null).Wait();
 
                 var chunkset1 = eventStore.ReadAsync(streamName).Result;
-                readMessage = chunkset1.Chunks.First().Instance as TestMessage;
+                readMessage = chunkset1.Items.First().Instance as TestMessage;
             };
 
         private It the_data_should_be_equal = () =>

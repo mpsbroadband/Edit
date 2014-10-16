@@ -17,7 +17,7 @@ namespace Edit.PerformanceTests
             return new List<T>();
         }
 
-        public IEnumerable<AppendOnlyStoreDynamicTableEntity> Write<T>(IEnumerable<T> frames, IStoredDataVersion version) where T : class
+        public IEnumerable<AppendOnlyStoreDynamicTableEntity> Write<T>(IEnumerable<T> frames, IVersion version) where T : class
         {
             var writer = new MultipleRowsDataEntityWriter(_serializer);
             return writer.GetUpdatedDataRows(frames, version);

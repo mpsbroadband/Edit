@@ -9,7 +9,7 @@ namespace Edit.Tests
     {
         protected static List<Chunk> chunkMessages;
         protected static TestMessage lastWrittenMessage = new TestMessage { Data = "Last Message" };
-        protected static ChunkSet readChunks;
+        protected static StreamSegment<> readChunks;
         protected static List<TestMessage> readMessages;
         protected const int NoMessages = 8000; //2831;
 
@@ -50,7 +50,7 @@ namespace Edit.Tests
             readMessages = new List<TestMessage>();
             var chunkset = eventStore.ReadAsync(streamName).Result;
 
-            foreach (var chunk in chunkset.Chunks)
+            foreach (var chunk in chunkset.Items)
             {
                 readMessages.Add(chunk.Instance as TestMessage);
             }

@@ -61,7 +61,7 @@ namespace Edit.PerformanceTests
             }
         }
 
-        private async Task<IStoredDataVersion> WriteRead(IStreamStore eventStore, String partitionKey, List<Chunk> chunks, int noChunksToWrite, IStoredDataVersion version)
+        private async Task<IVersion> WriteRead(IStreamStore eventStore, String partitionKey, List<Chunk> chunks, int noChunksToWrite, IVersion version)
         {
             await eventStore.WriteAsync(partitionKey, chunks.Take(noChunksToWrite), version);
             return eventStore.ReadAsync(partitionKey).Result.Version;
@@ -78,7 +78,7 @@ namespace Edit.PerformanceTests
             {
                 if (chunks.Count > MaxChunksPerTransaction)
                 {
-                    IStoredDataVersion version = null;
+                    IVersion version = null;
                     int chunksToWrite = 0;
                     int chunkCount = chunks.Count;
                     while (true)

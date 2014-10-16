@@ -16,7 +16,7 @@ namespace Edit.Tests
             writeMessages = TestMessage.CreateTestMessages(NoTransactions);
             streamName = Guid.NewGuid().ToString();
             var chunks = new List<Chunk>();
-            ChunkSet readChunks = null;
+            StreamSegment<> readChunks = null;
             foreach (var message in writeMessages)
             {
                 message.PayLoad = PayLoad;
@@ -35,7 +35,7 @@ namespace Edit.Tests
         private It the_read_messages_should_match_the_written_ones = () =>
         {
             int i = 0;
-            foreach (Chunk chunk in readMessages.Chunks)
+            foreach (Chunk chunk in readMessages.Items)
             {
                 (chunk.Instance as TestMessage).Data.ShouldEqual(writeMessages[i].Data);
                 i++;
@@ -43,7 +43,7 @@ namespace Edit.Tests
             i.ShouldEqual(writeMessages.Count);
         };
 
-        protected static ChunkSet readMessages;
+        protected static StreamSegment<> readMessages;
         protected static String streamName;
         protected static IStreamStore eventStore;
     }

@@ -43,25 +43,25 @@ namespace Edit.PerformanceTests
             //String id = Guid.NewGuid().ToString();
             String id = new Guid().ToString();
 
-            IStoredDataVersion version = null;
-            ChunkSet chunkSet = null;
+            IVersion version = null;
+            StreamSegment<> streamSegment = null;
 
             Console.Write("Writing");
 
             for (int i = 1; i <= aggregate.Count; i++)
             {
                 await eventStore.WriteAsync(id, aggregate.Take(i), version);
-                chunkSet = eventStore.ReadAsync(id).Result;
-                version = chunkSet.Version;
+                streamSegment = eventStore.ReadAsync(id).Result;
+                version = streamSegment.Version;
                 Console.Write(".");
             }
             Console.WriteLine();
             int totalStringLength = 0;
-            foreach (var chunk in chunkSet.Chunks)
+            foreach (var chunk in streamSegment.Items)
             {
                 totalStringLength += (chunk.Instance as CreatedCustomer).Name.Length;
             }
-            Console.WriteLine("No chunks read: {0} chunks. Total string length: {1}", chunkSet.Chunks.Count(), totalStringLength);
+            Console.WriteLine("No chunks read: {0} chunks. Total string length: {1}", streamSegment.Items.Count(), totalStringLength);
         }
     }
 }

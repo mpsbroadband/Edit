@@ -18,13 +18,13 @@ namespace Edit.Tests
                 var chunkset1 = eventStore.ReadAsync(streamName).Result;
 
                 // new write operation
-                eventStore.WriteAsync(streamName, chunkset1.Chunks, chunkset1.Version).Wait();
+                eventStore.WriteAsync(streamName, chunkset1.Items, chunkset1.Version).Wait();
             };
 
         private Because of = () =>
             {
                 var chunkset2 = eventStore.ReadAsync(streamName).Result;
-                eventStore.WriteAsync(streamName, chunkset2.Chunks, chunkset2.Version).Wait();
+                eventStore.WriteAsync(streamName, chunkset2.Items, chunkset2.Version).Wait();
                 worked = true;
             };
 

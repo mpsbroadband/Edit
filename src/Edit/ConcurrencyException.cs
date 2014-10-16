@@ -5,10 +5,10 @@ namespace Edit
     public class ConcurrencyException : Exception
     {
         public string StreamName { get; private set; }
-        public IStoredDataVersion ExpectedVersion { get; private set; }
+        public IVersion ExpectedVersion { get; private set; }
 
-        public ConcurrencyException(string streamName, IStoredDataVersion expectedVersion)
-            : base(string.Format("Expected version {0} in stream '{1}' but it has been changed since", expectedVersion, streamName))
+        public ConcurrencyException(string streamName, IVersion expectedVersion)
+            : base(string.Format("Version [{0}] is no longer current in stream [{1}].", expectedVersion, streamName))
         {
             StreamName = streamName;
             ExpectedVersion = expectedVersion;

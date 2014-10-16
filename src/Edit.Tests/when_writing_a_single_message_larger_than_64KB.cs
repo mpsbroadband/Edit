@@ -33,7 +33,7 @@ namespace Edit.Tests
                     eventStore.WriteAsync(streamName, chunks, null).Wait());
 
                 var chunkset = eventStore.ReadAsync(streamName).Result;
-                readMessage = chunkset.Chunks.First().Instance as TestMessage;
+                readMessage = chunkset.Items.First().Instance as TestMessage;
             };
 
         private It should_have_no_exception = () =>
