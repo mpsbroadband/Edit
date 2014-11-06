@@ -73,17 +73,12 @@ namespace Edit.AzureTableStorage
                                                 Columns.ToDictionary(c => string.Format("d{0}", ++columnSequence),
                                                                      c => c.ToProperty()));
             
-            if (IsDirty && string.IsNullOrEmpty(ETag))
+            if (string.IsNullOrEmpty(ETag))
             {
                 return TableOperation.Insert(entity);
             }
-            
-            if (IsDirty)
-            {
-                return TableOperation.Replace(entity);
-            }
 
-            return TableOperation.Insert(entity);
+            return TableOperation.Replace(entity);
         }
 
         public byte[] Write(byte[] buffer, int offset)
