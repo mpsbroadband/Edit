@@ -104,6 +104,10 @@
     <Compile Include="Row\when_writing_to_a_new_row.cs" />
     <Compile Include="Row\when_creating_a_row_from_an_existing_entity.cs" />
     <Compile Include="Row\when_creating_a_new_row.cs" />
+    <Compile Include="Writer\when_creating_a_batch_operation_from_an_existing_writer.cs" />
+    <Compile Include="Writer\when_creating_a_batch_operation_from_a_new_writer.cs" />
+    <Compile Include="Writer\when_writing_to_an_existing_writer.cs" />
+    <Compile Include="Writer\when_writing_to_a_new_writer.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Edit.AzureTableStorage\Edit.AzureTableStorage.csproj">
