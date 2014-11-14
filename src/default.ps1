@@ -15,6 +15,9 @@ Properties {
 	$SkipTests = $false
 	$BaconDll = "$PSScriptRoot\Build\Bacon.dll"
 	[string[]]$RemoteRepositories = $BuildRepository, "https://packages.nuget.org/api/v2"
+	if ($env:Teamcity_dotCover_home -ne $null){
+		$dotCover=$env:Teamcity_dotCover_home+ "\dotCover.exe"
+	}
 }
 
 Task Default -Depends Test
@@ -68,17 +71,48 @@ Task Build -Depends Restore {
 }
 
 Task Test -Depends Build -Precondition { return $SkipTests -ne $true } {
+    
 	$mspec = (Get-ChildItem -Recurse -Include "mspec-clr4.exe")[0]
 	
 	if ($mspec -eq $null) {
 		throw "Could not locate mspec."
 	}
 	
-	Get-ChildItem -Recurse -Include "*Tests.dll" | ForEach-Object { 
-		$file = $_
+	if($env:Teamcity_dotCover_home -ne $null){
+		$targetArguments=$null;
 		
-		if ($file.FullName.Contains($OutDir)) {
-			exec { & $mspec $file }
+		Get-ChildItem -Recurse -Include "*Tests.dll" | ForEach-Object { 
+			$file = $_
+			
+			if ($file.FullName.Contains($OutDir)) {
+				if($targetArguments -eq $null) {
+					$targetArguments=$file.FullName;
+				}
+				else {
+					$targetArguments+=' ' + $file.FullName;
+				}
+			}
+		}
+		$dotCoverOutput="F:\temp\dotCover\Edit\" + $Version + ".dcvr";
+		$mSpecExecutable=$mspec.FullName;
+		$analyseXml=[xml]"<CoverageParams>  <TargetExecutable>$mSpecExecutable</TargetExecutable>  <TargetArguments>$targetArguments</TargetArguments>  <TargetWorkingDir>$PSScriptRoot</TargetWorkingDir>  <Output>$dotCoverOutput</Output>  <Filters>        <IncludeFilters>      <FilterEntry>        <ModuleMask>*</ModuleMask>        <ClassMask>*</ClassMask>        <FunctionMask>*</FunctionMask>      </FilterEntry>    </IncludeFilters>    <ExcludeFilters>      <FilterEntry>        <ModuleMask>*Raven*</ModuleMask>        <ClassMask>*</ClassMask>        <FunctionMask>*</FunctionMask>      </FilterEntry> <FilterEntry>        <ModuleMask>*Esent*</ModuleMask>        <ClassMask>*</ClassMask>        <FunctionMask>*</FunctionMask>      </FilterEntry><FilterEntry>        <ModuleMask>*Lucene*</ModuleMask>        <ClassMask>*</ClassMask>        <FunctionMask>*</FunctionMask>      </FilterEntry><FilterEntry>        <ModuleMask>*Spatial4n*</ModuleMask>        <ClassMask>*</ClassMask>        <FunctionMask>*</FunctionMask>      </FilterEntry><FilterEntry>        <ModuleMask>*Edit*</ModuleMask>        <ClassMask>*</ClassMask>        <FunctionMask>*</FunctionMask>      </FilterEntry>    <FilterEntry>        <ModuleMask>*Bus*</ModuleMask>        <ClassMask>*</ClassMask>        <FunctionMask>*</FunctionMask>      </FilterEntry><FilterEntry>        <ModuleMask>*Common*</ModuleMask>        <ClassMask>*</ClassMask>        <FunctionMask>*</FunctionMask>      </FilterEntry><FilterEntry>        <ModuleMask>EventStore</ModuleMask>        <ClassMask>*</ClassMask>        <FunctionMask>*</FunctionMask>      </FilterEntry><FilterEntry>        <ModuleMask>NLog*</ModuleMask>        <ClassMask>*</ClassMask>        <FunctionMask>*</FunctionMask>      </FilterEntry><FilterEntry>        <ModuleMask>WamsApi*</ModuleMask>        <ClassMask>*</ClassMask>        <FunctionMask>*</FunctionMask>      </FilterEntry></ExcludeFilters>    </Filters>  <ReportType>xml</ReportType></CoverageParams>" ;
+
+		$analyseXmlPath="$PSScriptRoot\Build\analyse.xml";
+
+		$analyseXml.Save($analyseXmlPath);
+		Invoke-Expression "& `"$dotCover`" cover $analyseXmlPath"
+		$targetArguments=$null;
+
+		# pass message to teamcity to process code coverage
+		TeamCity-ImportDotNetCoverageResult 'dotcover' $dotCoverOutput
+	}
+	else{
+		Get-ChildItem -Recurse -Include "*Tests.dll" | ForEach-Object { 
+			$file = $_
+			
+			if ($file.FullName.Contains($OutDir)) {
+				exec { & $mspec $file }
+			}
 		}
 	}
 }
