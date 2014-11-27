@@ -8,7 +8,7 @@ namespace Edit.AzureTableStorage.Tests.Row
         {
             _streamName = "agg1";
             _sequence = 1;
-            _row = new BatchOperationRow(_streamName, _sequence);
+            _row = new BatchOperationRow(_streamName, _sequence, false);
         };
 
         private It should_not_have_any_columns = () => _row.Columns.ShouldBeEmpty();

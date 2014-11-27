@@ -19,7 +19,7 @@ namespace Edit.AzureTableStorage.Tests.Row
                                                          new EntityProperty(_existingData)
                                                      }
                                                  });
-            _row = new BatchOperationRow(_entity);
+            _row = new BatchOperationRow(_entity, false);
         };
 
         private Because of = () => _dataLeft = _row.Write(_dataToWrite, 0);

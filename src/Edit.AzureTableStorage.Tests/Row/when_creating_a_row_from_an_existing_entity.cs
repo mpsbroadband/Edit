@@ -16,7 +16,7 @@ namespace Edit.AzureTableStorage.Tests.Row
                                                          new EntityProperty(new byte[0])
                                                      }
                                                  });
-            _row = new BatchOperationRow(_entity);
+            _row = new BatchOperationRow(_entity, false);
         };
 
         private It should_have_columns = () => _row.Columns.ShouldNotBeEmpty();

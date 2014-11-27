@@ -75,6 +75,8 @@
     <Compile Include="BatchOperationColumn.cs" />
     <Compile Include="BatchOperationRow.cs" />
     <Compile Include="BatchOperationWriter.cs" />
+    <Compile Include="BlobStorageSnapshotStore.cs" />
+    <Compile Include="ITableOperationSerializer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TableOperationSerializer.cs" />
     <Compile Include="TableStorageStreamStore.cs" />

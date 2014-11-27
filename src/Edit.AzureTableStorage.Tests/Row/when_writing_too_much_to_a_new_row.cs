@@ -8,7 +8,7 @@ namespace Edit.AzureTableStorage.Tests.Row
     {
         private Establish context = () =>
         {
-            _row = new BatchOperationRow("agg1", 1);
+            _row = new BatchOperationRow("agg1", 1, false);
             _maxData = new byte[_row.MaxSize];
             _overflowData = new byte[] {1, 2, 3};
             _data = new byte[_maxData.Length + _overflowData.Length];

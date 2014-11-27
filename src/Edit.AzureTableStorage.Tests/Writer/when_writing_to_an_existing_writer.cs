@@ -25,7 +25,7 @@ namespace Edit.AzureTableStorage.Tests.Writer
                                                                                      }
                                                                                  })
                                                                     };
-                                            _writer = new BatchOperationWriter(_streamName, _existingEntities);
+                                            _writer = new BatchOperationWriter(_streamName, _existingEntities, false);
                                             _stream = new MemoryStream(_dataToWrite);
                                         };
 

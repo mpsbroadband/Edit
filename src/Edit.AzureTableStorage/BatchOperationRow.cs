@@ -12,19 +12,21 @@ namespace Edit.AzureTableStorage
         private const int MaxRowSizeEmulator = 300 * 1024;
         private const int MaxRowSize = 900 * 1024;
 
+        private readonly bool _developmentStorage;
         private readonly IList<BatchOperationColumn> _columns;
         private readonly int _sequence;
         private readonly string _streamName;
         private readonly string _etag;
 
-        public BatchOperationRow(string streamName, long sequence)
+        public BatchOperationRow(string streamName, long sequence, bool developmentStorage)
             : this(new DynamicTableEntity(streamName, sequence.ToString(CultureInfo.InvariantCulture), null,
-                                          new Dictionary<string, EntityProperty>()))
+                                          new Dictionary<string, EntityProperty>()), developmentStorage)
         {
         }
 
-        public BatchOperationRow(DynamicTableEntity entity)
+        public BatchOperationRow(DynamicTableEntity entity, bool developmentStorage)
         {
+            _developmentStorage = developmentStorage;
             _streamName = entity.PartitionKey;
             _sequence = int.Parse(entity.RowKey);
             _etag = entity.ETag;
@@ -53,7 +55,7 @@ namespace Edit.AzureTableStorage
 
         public int MaxSize
         {
-            get { return MaxRowSize; }
+            get { return _developmentStorage ? MaxRowSizeEmulator : MaxRowSize; }
         }
 
         public bool IsDirty

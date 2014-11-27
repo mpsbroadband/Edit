@@ -10,7 +10,7 @@ namespace Edit.AzureTableStorage.Tests.Row
     {
         private Establish context = () =>
         {
-            _existingData = new byte[new BatchOperationRow("a", 0).MaxSize - 1];
+            _existingData = new byte[new BatchOperationRow("a", 0, false).MaxSize - 1];
             _dataToWrite = new byte[] { 1, 2, 3, 4};
             _overflowData = new byte[] { 2, 3, 4 };
 
@@ -24,7 +24,7 @@ namespace Edit.AzureTableStorage.Tests.Row
                                                          new EntityProperty(_existingData)
                                                      }
                                                  });
-            _row = new BatchOperationRow(_entity);
+            _row = new BatchOperationRow(_entity, false);
         };
 
         private Because of = () => _dataLeft = _row.Write(_dataToWrite, 0);

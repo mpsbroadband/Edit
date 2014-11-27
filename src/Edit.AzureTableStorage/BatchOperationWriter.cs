@@ -10,12 +10,14 @@ namespace Edit.AzureTableStorage
     public class BatchOperationWriter
     {
         private readonly string _streamName;
+        private readonly bool _developmentStorage;
         private readonly List<BatchOperationRow> _rows;
 
-        public BatchOperationWriter(string streamName, IEnumerable<DynamicTableEntity> existingEntities)
+        public BatchOperationWriter(string streamName, IEnumerable<DynamicTableEntity> existingEntities, bool developmentStorage)
         {
             _streamName = streamName;
-            _rows = existingEntities.Select(e => new BatchOperationRow(e)).ToList();
+            _developmentStorage = developmentStorage;
+            _rows = existingEntities.Select(e => new BatchOperationRow(e, developmentStorage)).ToList();
         }
 
         public string StreamName
@@ -60,7 +62,7 @@ namespace Edit.AzureTableStorage
                     }
                     else
                     {
-                        _rows.Add(new BatchOperationRow(StreamName, _rows.Count));
+                        _rows.Add(new BatchOperationRow(StreamName, _rows.Count, _developmentStorage));
                     }
                 }
             }

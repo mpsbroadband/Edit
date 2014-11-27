@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Edit.JsonNet", "Edit.JsonNe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Edit.AzureTableStorage.Tests", "Edit.AzureTableStorage.Tests\Edit.AzureTableStorage.Tests.csproj", "{636A762A-5517-44D0-9940-2DF7089AB213}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Edit.AzureTableStorage.IntegrationTests", "Edit.AzureTableStorage.IntegrationTests\Edit.AzureTableStorage.IntegrationTests.csproj", "{53045AFA-BC53-4688-A29F-48FF9C2E7F15}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -31,6 +33,10 @@ Global
 		{636A762A-5517-44D0-9940-2DF7089AB213}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{636A762A-5517-44D0-9940-2DF7089AB213}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{636A762A-5517-44D0-9940-2DF7089AB213}.Release|Any CPU.Build.0 = Release|Any CPU
+		{53045AFA-BC53-4688-A29F-48FF9C2E7F15}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{53045AFA-BC53-4688-A29F-48FF9C2E7F15}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{53045AFA-BC53-4688-A29F-48FF9C2E7F15}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{53045AFA-BC53-4688-A29F-48FF9C2E7F15}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

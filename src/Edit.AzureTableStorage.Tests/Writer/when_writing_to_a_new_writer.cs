@@ -13,7 +13,7 @@ namespace Edit.AzureTableStorage.Tests.Writer
                                         {
                                             _streamName = "agg1";
                                             _existingEntities = new DynamicTableEntity[0];
-                                            _writer = new BatchOperationWriter(_streamName, _existingEntities);
+                                            _writer = new BatchOperationWriter(_streamName, _existingEntities, false);
                                             
                                             var data = new byte[1024 * 1024 * 2];
 
