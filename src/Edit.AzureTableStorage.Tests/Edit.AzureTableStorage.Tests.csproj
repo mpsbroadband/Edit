@@ -107,6 +107,7 @@
     <Compile Include="Version\when_creating_a_version_from_a_single_entity_with_multiple_properties.cs" />
     <Compile Include="Version\when_creating_a_version_from_multiple_entities.cs" />
     <Compile Include="Version\when_creating_a_version_from_a_single_entity.cs" />
+    <Compile Include="Writer\when_creating_a_batch_operation_from_an_existing_writer_with_no_changes.cs" />
     <Compile Include="Writer\when_creating_a_batch_operation_from_a_zero_length_writer.cs" />
     <Compile Include="Writer\when_writing_zero_bytes_to_a_new_writer.cs" />
     <Compile Include="Writer\when_creating_a_batch_operation_from_an_existing_writer.cs" />

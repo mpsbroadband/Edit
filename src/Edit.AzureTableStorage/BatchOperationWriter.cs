@@ -33,8 +33,9 @@ namespace Edit.AzureTableStorage
         public TableBatchOperation ToBatchOperation()
         {
             var batch = new TableBatchOperation();
-            
-            foreach (var row in _rows.Where(r => r.IsDirty || _rows.Count == 1))
+            var last = Rows.Last();
+
+            foreach (var row in Rows.Where(r => r.IsDirty || r == last))
             {
                 batch.Add(row.ToTableOperation());
             }
