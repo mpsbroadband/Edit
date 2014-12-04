@@ -5,7 +5,7 @@ namespace Edit
 {
     public interface ISnapshotStore
     {
-        Task<SnapshotEnvelope<T>> ReadAsync<T>(string id, CancellationToken token);
-        Task WriteAsync<T>(string id, SnapshotEnvelope<T> envelope, CancellationToken token);
+        Task<ISnapshotEnvelope<T>> ReadAsync<T>(string id, CancellationToken token);
+        Task WriteAsync<T>(string id, T snapshot, IVersion version, CancellationToken token);
     }
 }

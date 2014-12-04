@@ -1,8 +1,8 @@
-﻿namespace Edit
+﻿namespace Edit.AzureTableStorage
 {
-    public class SnapshotEnvelope<T>
+    public class TableStorageSnapshotEnvelope<T> : ISnapshotEnvelope<T>
     {
-        public SnapshotEnvelope(string partitionKey, string rowKey, string column, int position, T snapshot)
+        public TableStorageSnapshotEnvelope(string partitionKey, string rowKey, string column, int position, T snapshot)
         {
             PartitionKey = partitionKey;
             RowKey = rowKey;

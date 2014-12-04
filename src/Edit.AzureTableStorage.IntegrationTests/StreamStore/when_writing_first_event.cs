@@ -2,7 +2,7 @@
 using System;
 using System.Threading;
 
-namespace Edit.AzureTableStorage.IntegrationTests
+namespace Edit.AzureTableStorage.IntegrationTests.StreamStore
 {
     public class when_writing_first_event
     {
@@ -14,8 +14,8 @@ namespace Edit.AzureTableStorage.IntegrationTests
 
         private Because of = () =>
         {
-            AssemblyContext.Store.WriteAsync(_streamName, new[] {_event}, null, new CancellationToken()).Await();
-            _segment = AssemblyContext.Store.ReadAsync<IEvent, IAggregate>(_streamName, null, new CancellationToken()).Await().AsTask.Result;
+            AssemblyContext.StreamStore.WriteAsync(_streamName, new[] {_event}, null, new CancellationToken()).Await();
+            _segment = AssemblyContext.StreamStore.ReadAsync<IEvent, IState>(_streamName, null, new CancellationToken()).Await().AsTask.Result;
         };
 
         private It should_have_the_event_in_the_segment = () => _segment.Items.ShouldContain(_event);

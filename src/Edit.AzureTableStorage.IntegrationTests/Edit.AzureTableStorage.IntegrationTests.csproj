@@ -87,14 +87,17 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="SnapshotStore\when_writing_and_reading_back_a_snapshot.cs" />
+    <Compile Include="StateOne.cs" />
     <Compile Include="AssemblyContext.cs" />
     <Compile Include="EventTwo.cs" />
-    <Compile Include="when_writing_second_event.cs" />
-    <Compile Include="IAggregate.cs" />
+    <Compile Include="StreamStore\when_reading_events_after_snapshot.cs" />
+    <Compile Include="StreamStore\when_writing_second_event.cs" />
+    <Compile Include="IState.cs" />
     <Compile Include="EventOne.cs" />
     <Compile Include="IEvent.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="when_writing_first_event.cs" />
+    <Compile Include="StreamStore\when_writing_first_event.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Edit.AzureTableStorage\Edit.AzureTableStorage.csproj">
@@ -113,6 +116,7 @@
   <ItemGroup>
     <None Include="app.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -78,6 +78,7 @@
     <Compile Include="BlobStorageSnapshotStore.cs" />
     <Compile Include="ITableOperationSerializer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TableStorageSnapshotEnvelope.cs" />
     <Compile Include="TableOperationSerializer.cs" />
     <Compile Include="TableStorageStreamStore.cs" />
     <Compile Include="TableStorageVersion.cs" />

@@ -2,7 +2,7 @@
 using System;
 using System.Threading;
 
-namespace Edit.AzureTableStorage.IntegrationTests
+namespace Edit.AzureTableStorage.IntegrationTests.StreamStore
 {
     public class when_writing_second_event
     {
@@ -12,14 +12,14 @@ namespace Edit.AzureTableStorage.IntegrationTests
             _eventOne = new EventOne("value1");
             _eventTwo = new EventTwo("value2");
 
-            AssemblyContext.Store.WriteAsync(_streamName, new[] { _eventOne }, null, new CancellationToken()).Await();
-            _segment = AssemblyContext.Store.ReadAsync<IEvent, IAggregate>(_streamName, null, new CancellationToken()).Await().AsTask.Result;
+            AssemblyContext.StreamStore.WriteAsync(_streamName, new[] { _eventOne }, null, new CancellationToken()).Await();
+            _segment = AssemblyContext.StreamStore.ReadAsync<IEvent, IState>(_streamName, null, new CancellationToken()).Await().AsTask.Result;
         };
 
         private Because of = () =>
         {
-            AssemblyContext.Store.WriteAsync(_streamName, new[] { _eventTwo }, _segment.Version, new CancellationToken()).Await();
-            _segment = AssemblyContext.Store.ReadAsync<IEvent, IAggregate>(_streamName, null, new CancellationToken()).Await().AsTask.Result;
+            AssemblyContext.StreamStore.WriteAsync(_streamName, new[] { _eventTwo }, _segment.Version, new CancellationToken()).Await();
+            _segment = AssemblyContext.StreamStore.ReadAsync<IEvent, IState>(_streamName, null, new CancellationToken()).Await().AsTask.Result;
         };
 
         private It should_have_both_events_in_the_segment = () => _segment.Items.ShouldContain(_eventOne, _eventTwo);

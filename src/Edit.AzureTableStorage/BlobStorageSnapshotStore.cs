@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
@@ -15,18 +16,18 @@ namespace Edit.AzureTableStorage
         {
             _serializer = serializer;
             _client = storageAccount.CreateCloudBlobClient();
-            _container = _client.GetContainerReference("SnapshotStore");
+            _container = _client.GetContainerReference("snapshot-store");
             _container.CreateIfNotExists();
         }
 
-        public async Task<SnapshotEnvelope<T>> ReadAsync<T>(string id, CancellationToken token)
+        public async Task<ISnapshotEnvelope<T>> ReadAsync<T>(string id, CancellationToken token)
         {
             var reference = await _container.GetBlobReferenceFromServerAsync(id);
             if (await reference.ExistsAsync())
             {
                 using (var stream = await reference.OpenReadAsync(token))
                 {
-                    return _serializer.Deserialize<SnapshotEnvelope<T>>(stream);
+                    return _serializer.Deserialize<ISnapshotEnvelope<T>>(stream);
                 }
             }
             else
@@ -35,12 +36,21 @@ namespace Edit.AzureTableStorage
             }
         }
 
-        public async Task WriteAsync<T>(string id, SnapshotEnvelope<T> envelope, CancellationToken token)
+        public async Task WriteAsync<T>(string id, T snapshot, IVersion version, CancellationToken token)
         {
+            var tableVersion = version as TableStorageVersion;
+
+            if (tableVersion == null)
+            {
+                throw new ArgumentException("Only Azure Table Storage versions are supported.", "version");
+            }
+
             using (var stream = await _container.GetBlockBlobReference(id)
                                                 .OpenWriteAsync(token))
             {
-                _serializer.Serialize(envelope, stream);
+                _serializer.Serialize(
+                    new TableStorageSnapshotEnvelope<T>(tableVersion.PartitionKey, tableVersion.RowKey, tableVersion.Column,
+                                            tableVersion.Position, snapshot), stream);
             }
         }
     }

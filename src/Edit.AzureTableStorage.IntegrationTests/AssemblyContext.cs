@@ -7,17 +7,23 @@ namespace Edit.AzureTableStorage.IntegrationTests
 {
     public class AssemblyContext : IAssemblyContext
     {
-        public static TableStorageStreamStore Store { get; private set; }
+        public static TableStorageStreamStore StreamStore { get; private set; }
+        public static BlobStorageSnapshotStore SnapshotStore { get; private set; }
 
         public void OnAssemblyStart()
         {
-            Store = new TableStorageStreamStore(
-                new TableOperationSerializer(
-                    new JsonNetSerializer(new JsonSerializerSettings
-                                              {
-                                                  TypeNameHandling = TypeNameHandling.All
-                                              })),
-                CloudStorageAccount.DevelopmentStorageAccount);
+            var serializer = new JsonNetSerializer(
+                new JsonSerializerSettings
+                    {
+                        TypeNameHandling = TypeNameHandling.All
+                    });
+
+            StreamStore = new TableStorageStreamStore(
+                                    new TableOperationSerializer(serializer),
+                                    CloudStorageAccount.DevelopmentStorageAccount);
+            SnapshotStore = new BlobStorageSnapshotStore(
+                                    serializer, 
+                                    CloudStorageAccount.DevelopmentStorageAccount);
         }
 
         public void OnAssemblyComplete()

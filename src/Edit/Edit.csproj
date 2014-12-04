@@ -36,18 +36,14 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Chunk.cs" />
+    <Compile Include="ISnapshotEnvelope.cs" />
     <Compile Include="StreamSegment.cs" />
     <Compile Include="ConcurrencyException.cs" />
-    <Compile Include="CorruptedStorageException.cs" />
     <Compile Include="ISnapshotStore.cs" />
     <Compile Include="IVersion.cs" />
     <Compile Include="IStreamStore.cs" />
     <Compile Include="ISerializer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SnapshotEnvelope.cs" />
-    <Compile Include="StorageSizeException.cs" />
-    <Compile Include="TaskExtensions.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
