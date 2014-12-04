@@ -34,7 +34,7 @@ namespace Edit.AzureTableStorage
         {
             var batch = new TableBatchOperation();
             
-            foreach (var row in Rows.Where(r => r.IsDirty))
+            foreach (var row in _rows.Where(r => r.IsDirty || _rows.Count == 1))
             {
                 batch.Add(row.ToTableOperation());
             }
@@ -46,6 +46,11 @@ namespace Edit.AzureTableStorage
         {
             var buffer = new byte[4096];
             int read;
+
+            if (!Rows.Any())
+            {
+                _rows.Add(new BatchOperationRow(_streamName, 0, _developmentStorage));
+            }
 
             while ((read = stream.Read(buffer, 0, buffer.Length)) > 0)
             {
