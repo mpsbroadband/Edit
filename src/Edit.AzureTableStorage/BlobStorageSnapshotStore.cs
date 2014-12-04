@@ -22,7 +22,8 @@ namespace Edit.AzureTableStorage
 
         public async Task<ISnapshotEnvelope<T>> ReadAsync<T>(string id, CancellationToken token)
         {
-            var reference = await _container.GetBlobReferenceFromServerAsync(id);
+            var reference = _container.GetBlockBlobReference(id);
+
             if (await reference.ExistsAsync())
             {
                 using (var stream = await reference.OpenReadAsync(token))
