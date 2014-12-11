@@ -18,7 +18,7 @@ namespace Edit.AzureTableStorage.IntegrationTests.StreamStore
 
         private Because of = () =>
         {
-            AssemblyContext.StreamStore.WriteAsync(_streamName, new[] { _eventTwo }, _segment.Version, new CancellationToken()).Await();
+            _version = AssemblyContext.StreamStore.WriteAsync(_streamName, new[] { _eventTwo }, _segment.Version, new CancellationToken()).Await().AsTask.Result;
             _segment = AssemblyContext.StreamStore.ReadAsync<IEvent, IState>(_streamName, null, new CancellationToken()).Await().AsTask.Result;
         };
 
@@ -30,9 +30,12 @@ namespace Edit.AzureTableStorage.IntegrationTests.StreamStore
             ((TableStorageVersion)_segment.Version).Entities.ShouldNotBeEmpty();
         };
 
+        private It should_return_the_written_version = () => _version.ShouldEqual(_segment.Version);
+
         private static string _streamName;
         private static StreamSegment<IEvent> _segment;
         private static EventOne _eventOne;
         private static EventTwo _eventTwo;
+        private static IVersion _version;
     }
 }

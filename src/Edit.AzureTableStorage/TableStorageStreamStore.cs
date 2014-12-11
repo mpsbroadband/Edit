@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage;
@@ -26,7 +27,7 @@ namespace Edit.AzureTableStorage
                                                                         .BaseUri;
         }
 
-        public async Task WriteAsync<T>(string streamName, IEnumerable<T> items, IVersion expectedVersion, CancellationToken token) where T : class 
+        public async Task<IVersion> WriteAsync<T>(string streamName, IEnumerable<T> items, IVersion expectedVersion, CancellationToken token) where T : class 
         {
             var version = expectedVersion as TableStorageVersion;
             var existingEntities = version != null ? version.Entities : new DynamicTableEntity[0];
@@ -34,7 +35,9 @@ namespace Edit.AzureTableStorage
 
             try
             {
-                await _table.ExecuteBatchAsync(batch);
+                var result = await _table.ExecuteBatchAsync(batch);
+
+                return new TableStorageVersion(result.Select(r => (DynamicTableEntity) r.Result));
             }
             catch (StorageException)
             {

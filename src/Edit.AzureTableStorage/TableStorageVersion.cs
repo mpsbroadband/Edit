@@ -14,6 +14,7 @@ namespace Edit.AzureTableStorage
             RowKey = Entities.Last().RowKey;
             Column = Entities.Last().Properties.OrderBy(p => p.Key).Last().Key;
             Position = Entities.Last().Properties.OrderBy(p => p.Key).Last().Value.BinaryValue.Length;
+            ETag = Entities.Select(e => e.ETag).LastOrDefault() ?? string.Empty;
         }
 
         public IEnumerable<DynamicTableEntity> Entities { get; private set; }
@@ -21,10 +22,52 @@ namespace Edit.AzureTableStorage
         public string RowKey { get; private set; }
         public string Column { get; private set; }
         public int Position { get; private set; }
+        public string ETag { get; private set; }
 
         public override string ToString()
         {
-            return Entities.Select(e => e.ETag).LastOrDefault() ?? string.Empty;
+            return ETag;
+        }
+
+        protected bool Equals(TableStorageVersion other)
+        {
+            return string.Equals(PartitionKey, other.PartitionKey) && string.Equals(RowKey, other.RowKey) &&
+                   string.Equals(Column, other.Column) && Position == other.Position && string.Equals(ETag, other.ETag);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj))
+            {
+                return false;
+            }
+
+            if (ReferenceEquals(this, obj))
+            {
+                return true;
+            }
+
+            if (obj.GetType() != GetType())
+            {
+                return false;
+            }
+
+            return Equals((TableStorageVersion) obj);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                var hashCode = (PartitionKey != null ? PartitionKey.GetHashCode() : 0);
+
+                hashCode = (hashCode*397) ^ (RowKey != null ? RowKey.GetHashCode() : 0);
+                hashCode = (hashCode*397) ^ (Column != null ? Column.GetHashCode() : 0);
+                hashCode = (hashCode*397) ^ Position;
+                hashCode = (hashCode*397) ^ (ETag != null ? ETag.GetHashCode() : 0);
+
+                return hashCode;
+            }
         }
     }
 }
