@@ -28,7 +28,7 @@ namespace Edit.AzureTableStorage.Tests.Row
 
         private It should_not_have_an_etag = () => _entity.ETag.ShouldBeNull();
 
-        private It should_not_have_any_properties = () => _entity.Properties.ShouldBeEmpty();
+        private It should_have_one_property = () => _entity.Properties.Count.ShouldEqual(1);
 
         private It should_have_stream_name_as_partition_key = () => _entity.PartitionKey.ShouldEqual(_streamName);
 

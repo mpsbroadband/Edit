@@ -25,7 +25,7 @@ namespace Edit.AzureTableStorage.Tests.Writer
 
         private It should_have_a_single_operation_in_batch = () => _batchOperation.Count.ShouldEqual(1);
 
-        private It should_only_have_non_dirty_rows = () => _writer.Rows.All(r => !r.IsDirty).ShouldBeTrue();
+        private It should_only_have_dirty_rows = () => _writer.Rows.All(r => r.IsDirty).ShouldBeTrue();
 
         private static BatchOperationWriter _writer;
         private static string _streamName;

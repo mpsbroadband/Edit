@@ -22,6 +22,7 @@ namespace Edit.AzureTableStorage
             : this(new DynamicTableEntity(streamName, sequence.ToString(CultureInfo.InvariantCulture), null,
                                           new Dictionary<string, EntityProperty>()), developmentStorage)
         {
+            _columns = new List<BatchOperationColumn> { new BatchOperationColumn() };
         }
 
         public BatchOperationRow(DynamicTableEntity entity, bool developmentStorage)
@@ -60,7 +61,7 @@ namespace Edit.AzureTableStorage
 
         public bool IsDirty
         {
-            get { return Columns.Any(c => c.IsDirty); }
+            get { return _columns.Any(c => c.IsDirty); }
         }
 
         public IEnumerable<BatchOperationColumn> Columns

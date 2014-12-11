@@ -11,14 +11,14 @@ namespace Edit.AzureTableStorage
         private readonly byte[] _originalData;
         private byte[] _data;
 
-        public BatchOperationColumn() : this(new EntityProperty(new byte[0]))
+        public BatchOperationColumn() : this(new EntityProperty((byte[])null))
         {   
         }
 
         public BatchOperationColumn(EntityProperty property)
         {
-            _originalData = (byte[])(property.BinaryValue ?? new byte[0]).Clone();
-            _data = (byte[])_originalData.Clone();
+            _originalData = property.BinaryValue;
+            _data = _originalData ?? new byte[0];
         }
 
         public int Size
@@ -38,7 +38,7 @@ namespace Edit.AzureTableStorage
 
         public bool IsDirty
         {
-            get { return !_originalData.SequenceEqual(_data); }
+            get { return _originalData == null || !_originalData.SequenceEqual(_data); }
         }
 
         public EntityProperty ToProperty()

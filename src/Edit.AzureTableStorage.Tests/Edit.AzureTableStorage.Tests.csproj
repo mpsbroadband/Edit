@@ -96,6 +96,7 @@
     <Compile Include="Column\when_creating_a_new_column.cs" />
     <Compile Include="Column\when_creating_a_property_from_a_new_column.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Row\when_writing_zero_bytes_to_a_new_row.cs" />
     <Compile Include="Row\when_writing_too_much_to_an_existing_row.cs" />
     <Compile Include="Row\when_writing_to_an_existing_row.cs" />
     <Compile Include="Row\when_creating_a_table_operation_from_an_existing_row.cs" />

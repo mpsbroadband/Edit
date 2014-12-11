@@ -91,6 +91,7 @@
     <Compile Include="StateOne.cs" />
     <Compile Include="AssemblyContext.cs" />
     <Compile Include="EventTwo.cs" />
+    <Compile Include="StreamStore\when_writing_zero_events.cs" />
     <Compile Include="StreamStore\when_reading_events_after_snapshot.cs" />
     <Compile Include="StreamStore\when_writing_second_event.cs" />
     <Compile Include="IState.cs" />

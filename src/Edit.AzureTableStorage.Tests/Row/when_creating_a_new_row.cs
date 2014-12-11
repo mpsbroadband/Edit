@@ -1,4 +1,5 @@
-﻿using Machine.Specifications;
+﻿using System.Linq;
+using Machine.Specifications;
 
 namespace Edit.AzureTableStorage.Tests.Row
 {
@@ -11,11 +12,11 @@ namespace Edit.AzureTableStorage.Tests.Row
             _row = new BatchOperationRow(_streamName, _sequence, false);
         };
 
-        private It should_not_have_any_columns = () => _row.Columns.ShouldBeEmpty();
+        private It should_have_one_column = () => _row.Columns.Count().ShouldEqual(1);
 
         private It should_have_a_size_of_zero = () => _row.Size.ShouldEqual(0);
 
-        private It should_not_be_dirty = () => _row.IsDirty.ShouldBeFalse();
+        private It should_be_dirty = () => _row.IsDirty.ShouldBeTrue();
 
         private It should_not_have_an_etag = () => _row.ETag.ShouldBeNull();
 
