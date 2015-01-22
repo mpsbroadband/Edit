@@ -8,7 +8,7 @@ namespace Edit.AzureTableStorage.Tests.Row
     {
         private Because of = () =>
         {
-            _entity = new DynamicTableEntity("agg1", "1", "etag",
+            _entity = new DynamicTableEntity("agg1", "test-1", "etag",
                                              new Dictionary<string, EntityProperty>
                                                  {
                                                      {
@@ -29,7 +29,9 @@ namespace Edit.AzureTableStorage.Tests.Row
 
         private It should_have_a_stream_name = () => _row.StreamName.ShouldEqual(_entity.PartitionKey);
 
-        private It should_have_a_sequence = () => _row.Sequence.ShouldEqual(int.Parse(_entity.RowKey));
+        private It should_have_a_sequence = () => _row.Sequence.ShouldEqual(1);
+
+        private It should_have_a_sequence_prefix = () => _row.SequencePrefix.ShouldEqual("test");
 
         private static BatchOperationRow _row;
         private static DynamicTableEntity _entity;

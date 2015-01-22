@@ -11,7 +11,7 @@ namespace Edit.AzureTableStorage.Tests.Row
         {
             _dataToWrite = new byte[] { 4, 5, 6 };
             _existingData = new byte[] { 1, 2, 3 };
-            _entity = new DynamicTableEntity("agg1", "1", "etag",
+            _entity = new DynamicTableEntity("agg1", "test-1", "etag",
                                              new Dictionary<string, EntityProperty>
                                                  {
                                                      {

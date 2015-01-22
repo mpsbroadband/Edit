@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Microsoft.WindowsAzure.Storage.Table;
 
 namespace Edit.AzureTableStorage
@@ -17,26 +18,42 @@ namespace Edit.AzureTableStorage
         private readonly int _sequence;
         private readonly string _streamName;
         private readonly string _etag;
+        private readonly string _sequencePrefix;
 
-        public BatchOperationRow(string streamName, long sequence, bool developmentStorage)
-            : this(new DynamicTableEntity(streamName, sequence.ToString(CultureInfo.InvariantCulture), null,
-                                          new Dictionary<string, EntityProperty>()), developmentStorage)
+        public BatchOperationRow(string streamName, string sequencePrefix, long sequence, bool developmentStorage)
+            : this(new DynamicTableEntity(streamName,
+                    FormatRowKey(sequencePrefix, sequence), null,
+                    new Dictionary<string, EntityProperty>()), developmentStorage)
         {
-            _columns = new List<BatchOperationColumn> { new BatchOperationColumn() };
+            _columns = new List<BatchOperationColumn> {new BatchOperationColumn()};
         }
 
         public BatchOperationRow(DynamicTableEntity entity, bool developmentStorage)
         {
             _developmentStorage = developmentStorage;
             _streamName = entity.PartitionKey;
-            _sequence = int.Parse(entity.RowKey);
             _etag = entity.ETag;
             _columns = entity.Properties.Select(p => new BatchOperationColumn(p.Value)).ToList();
+
+            var match = Regex.Match(entity.RowKey, @"(.*)-(\d+)");
+
+            if (!match.Success)
+            {
+                throw new ArgumentException(string.Format("{0} is not a valid sequence row key.", entity.RowKey), "entity");
+            }
+
+            _sequencePrefix = match.Groups[1].Value;
+            _sequence = int.Parse(match.Groups[2].Value);
         }
 
         public string StreamName
         {
             get { return _streamName; }
+        }
+
+        public string SequencePrefix
+        {
+            get { return _sequencePrefix; }
         }
 
         public long Sequence
@@ -72,9 +89,9 @@ namespace Edit.AzureTableStorage
         public TableOperation ToTableOperation()
         {
             var columnSequence = 0;
-            var entity = new DynamicTableEntity(StreamName, Sequence.ToString(CultureInfo.InvariantCulture), ETag,
-                                                Columns.ToDictionary(c => string.Format("d{0}", ++columnSequence),
-                                                                     c => c.ToProperty()));
+            var entity = new DynamicTableEntity(StreamName,
+                FormatRowKey(SequencePrefix, Sequence), ETag,
+                Columns.ToDictionary(c => string.Format("d{0}", columnSequence++), c => c.ToProperty()));
             
             if (string.IsNullOrEmpty(ETag))
             {
@@ -112,6 +129,11 @@ namespace Edit.AzureTableStorage
             Array.Copy(buffer, startIndex, remainder, 0, remainder.Length);
 
             return remainder;
+        }
+
+        public static string FormatRowKey(string sequencePrefix, long sequence)
+        {
+            return string.Concat(sequencePrefix, "-", sequence.ToString(CultureInfo.InvariantCulture));
         }
     }
 }

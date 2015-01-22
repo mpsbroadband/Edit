@@ -10,6 +10,9 @@ namespace Edit.AzureTableStorage
 {
     public class TableStorageStreamStore : IStreamStore
     {
+        private const string StreamSequencePrefix = "stream";
+        private const string CausationSequencePrefix = "causation";
+
         private readonly ITableOperationSerializer _serializer;
         private readonly CloudTableClient _client;
         private readonly CloudTable _table;
@@ -27,17 +30,30 @@ namespace Edit.AzureTableStorage
                                                                         .BaseUri;
         }
 
-        public async Task<IVersion> WriteAsync<T>(string streamName, IEnumerable<T> items, IVersion expectedVersion, CancellationToken token) where T : class 
+        public async Task<IVersion> WriteAsync<T>(string streamName, string causationId, IEnumerable<T> items, IVersion expectedVersion, CancellationToken token) where T : class 
         {
             var version = expectedVersion as TableStorageVersion;
             var existingEntities = version != null ? version.Entities : new DynamicTableEntity[0];
-            var batch = _serializer.Serialize(streamName, items, existingEntities, _developmentStorage);
+            var itemsList = items.ToList();
+            var streamBatch = _serializer.Serialize(streamName, StreamSequencePrefix, itemsList, 
+                                                    existingEntities, _developmentStorage);
+            var causationBatch = _serializer.Serialize(streamName, string.Concat(CausationSequencePrefix, "-", causationId), 
+                                                       itemsList, new DynamicTableEntity[0], _developmentStorage);
+            
+            var batch = new TableBatchOperation();
+            foreach (var operation in streamBatch.Union(causationBatch))
+            {
+                batch.Add(operation);
+            }
 
             try
             {
-                var result = await _table.ExecuteBatchAsync(batch);
+                var result = await _table.ExecuteBatchAsync(batch, token);
 
-                return new TableStorageVersion(result.Select(r => (DynamicTableEntity) r.Result));
+                return
+                    new TableStorageVersion(
+                        result.Select(r => (DynamicTableEntity) r.Result)
+                            .Where(e => e.RowKey.StartsWith(StreamSequencePrefix)));
             }
             catch (StorageException)
             {
@@ -45,16 +61,22 @@ namespace Edit.AzureTableStorage
             }
         }
 
-        public async Task<StreamSegment<T>> ReadAsync<T, TSnapshot>(string streamName, ISnapshotEnvelope<TSnapshot> snapshot, CancellationToken cancellationToken) where T : class
+        public async Task<StreamSegment<T>> ReadAsync<T, TSnapshot>(string streamName, string causationId, ISnapshotEnvelope<TSnapshot> snapshot, CancellationToken cancellationToken) where T : class
         {
-            var filter = TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, streamName);
             var tableSnapshot = snapshot as TableStorageSnapshotEnvelope<TSnapshot>;
-
-            if (tableSnapshot != null)
-            {
-                filter = TableQuery.CombineFilters(filter, "and", TableQuery.GenerateFilterCondition("RowKey", QueryComparisons.GreaterThanOrEqual, tableSnapshot.RowKey));
-            }
-
+            var streamRowKey = tableSnapshot != null
+                ? tableSnapshot.RowKey
+                : BatchOperationRow.FormatRowKey(StreamSequencePrefix, 0);
+            var streamFilter = TableQuery.CombineFilters(
+                                        TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, streamName), 
+                                        "and", 
+                                        TableQuery.GenerateFilterCondition("RowKey", QueryComparisons.GreaterThanOrEqual, streamRowKey));
+            var causationRowKey = BatchOperationRow.FormatRowKey(string.Concat(CausationSequencePrefix, "-", causationId), 0);
+            var causationFilter = TableQuery.CombineFilters(
+                                        TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, streamName),
+                                        "and",
+                                        TableQuery.GenerateFilterCondition("RowKey", QueryComparisons.GreaterThanOrEqual, causationRowKey));
+            var filter = TableQuery.CombineFilters(streamFilter, "or", causationFilter);
             var continuationToken = new TableContinuationToken();
             var entities = new List<DynamicTableEntity>();
 
@@ -66,11 +88,16 @@ namespace Edit.AzureTableStorage
                 continuationToken = result.ContinuationToken;
             }
 
-            var items = _serializer.Deserialize<T>(
-                                    entities, tableSnapshot != null ? tableSnapshot.Column : null,
+            var streamItems = _serializer.Deserialize<T>(
+                                    entities.Where(e => e.RowKey.StartsWith(StreamSequencePrefix)), 
+                                    tableSnapshot != null ? tableSnapshot.Column : null,
                                     tableSnapshot != null ? tableSnapshot.Position : 0);
 
-            return new StreamSegment<T>(items, new TableStorageVersion(entities));
+            var causationItems = _serializer.Deserialize<T>(
+                                    entities.Where(e => e.RowKey.StartsWith(CausationSequencePrefix)), null, 0);
+
+            return new StreamSegment<T>(streamItems, causationItems,
+                new TableStorageVersion(entities.Where(e => e.RowKey.StartsWith(StreamSequencePrefix))));
         }
     }
 }

@@ -16,9 +16,9 @@ namespace Edit.AzureTableStorage
             _serializer = serializer;
         }
 
-        public TableBatchOperation Serialize<T>(string streamName, IEnumerable<T> items, IEnumerable<DynamicTableEntity> existingEntities, bool developmentStorage) where T : class
+        public TableBatchOperation Serialize<T>(string streamName, string sequencePrefix, IEnumerable<T> items, IEnumerable<DynamicTableEntity> existingEntities, bool developmentStorage) where T : class
         {
-            var writer = new BatchOperationWriter(streamName, existingEntities, developmentStorage);
+            var writer = new BatchOperationWriter(streamName, sequencePrefix, existingEntities, developmentStorage);
 
             using (var stream = new MemoryStream())
             {

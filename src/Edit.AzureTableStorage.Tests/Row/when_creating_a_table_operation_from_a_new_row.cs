@@ -11,7 +11,8 @@ namespace Edit.AzureTableStorage.Tests.Row
         {
             _streamName = "agg1";
             _sequence = 1;
-            _row = new BatchOperationRow(_streamName, _sequence, false);
+            _sequencePrefix = "test";
+            _row = new BatchOperationRow(_streamName, _sequencePrefix, _sequence, false);
         };
 
         private Because of = () =>
@@ -32,12 +33,13 @@ namespace Edit.AzureTableStorage.Tests.Row
 
         private It should_have_stream_name_as_partition_key = () => _entity.PartitionKey.ShouldEqual(_streamName);
 
-        private It should_have_sequence_number_as_row_key = () => _entity.RowKey.ShouldEqual(_sequence.ToString(CultureInfo.InvariantCulture));
+        private It should_have_sequence_prefix_and_number_as_row_key = () => _entity.RowKey.ShouldEqual(string.Concat(_sequencePrefix, "-", _sequence.ToString(CultureInfo.InvariantCulture)));
 
         private static BatchOperationRow _row;
         private static string _streamName;
         private static long _sequence;
         private static TableOperation _tableOperation;
         private static DynamicTableEntity _entity;
+        private static string _sequencePrefix;
     }
 }

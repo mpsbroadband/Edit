@@ -10,13 +10,13 @@ namespace Edit.AzureTableStorage.Tests.Row
     {
         private Establish context = () =>
         {
-            _existingData = new byte[new BatchOperationRow("a", 0, false).MaxSize - 1];
+            _existingData = new byte[new BatchOperationRow("a", "test", 0, false).MaxSize - 1];
             _dataToWrite = new byte[] { 1, 2, 3, 4};
             _overflowData = new byte[] { 2, 3, 4 };
 
             new Random().NextBytes(_existingData);
 
-            _entity = new DynamicTableEntity("agg1", "1", "etag",
+            _entity = new DynamicTableEntity("agg1", "test-1", "etag",
                                  new Dictionary<string, EntityProperty>
                                                  {
                                                      {

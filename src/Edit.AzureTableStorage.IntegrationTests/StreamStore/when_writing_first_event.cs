@@ -10,15 +10,16 @@ namespace Edit.AzureTableStorage.IntegrationTests.StreamStore
         {
             _streamName = Guid.NewGuid().ToString();
             _event = new EventOne("value");
+            _causationId = Guid.NewGuid().ToString();
         };
 
         private Because of = () =>
         {
-            _version = AssemblyContext.StreamStore.WriteAsync(_streamName, new[] {_event}, null, new CancellationToken()).Await().AsTask.Result;
-            _segment = AssemblyContext.StreamStore.ReadAsync<IEvent, IState>(_streamName, null, new CancellationToken()).Await().AsTask.Result;
+            _version = AssemblyContext.StreamStore.WriteAsync(_streamName, _causationId, new[] {_event}, null, new CancellationToken()).Await().AsTask.Result;
+            _segment = AssemblyContext.StreamStore.ReadAsync<IEvent, IState>(_streamName, _causationId, null, new CancellationToken()).Await().AsTask.Result;
         };
 
-        private It should_have_the_event_in_the_segment = () => _segment.Items.ShouldContain(_event);
+        private It should_have_the_event_in_the_segment = () => _segment.StreamItems.ShouldContain(_event);
 
         private It should_have_the_event_entity_in_the_version = () =>
         {
@@ -32,5 +33,6 @@ namespace Edit.AzureTableStorage.IntegrationTests.StreamStore
         private static EventOne _event;
         private static StreamSegment<IEvent> _segment;
         private static IVersion _version;
+        private static string _causationId;
     }
 }

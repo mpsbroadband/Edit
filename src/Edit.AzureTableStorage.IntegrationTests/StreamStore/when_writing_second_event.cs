@@ -11,18 +11,20 @@ namespace Edit.AzureTableStorage.IntegrationTests.StreamStore
             _streamName = Guid.NewGuid().ToString();
             _eventOne = new EventOne("value1");
             _eventTwo = new EventTwo("value2");
+            _causationIdOne = Guid.NewGuid().ToString();
+            _causationIdTwo = Guid.NewGuid().ToString();
 
-            AssemblyContext.StreamStore.WriteAsync(_streamName, new[] { _eventOne }, null, new CancellationToken()).Await();
-            _segment = AssemblyContext.StreamStore.ReadAsync<IEvent, IState>(_streamName, null, new CancellationToken()).Await().AsTask.Result;
+            AssemblyContext.StreamStore.WriteAsync(_streamName, _causationIdOne, new[] { _eventOne }, null, new CancellationToken()).Await();
+            _segment = AssemblyContext.StreamStore.ReadAsync<IEvent, IState>(_streamName, _causationIdOne, null, new CancellationToken()).Await().AsTask.Result;
         };
 
         private Because of = () =>
         {
-            _version = AssemblyContext.StreamStore.WriteAsync(_streamName, new[] { _eventTwo }, _segment.Version, new CancellationToken()).Await().AsTask.Result;
-            _segment = AssemblyContext.StreamStore.ReadAsync<IEvent, IState>(_streamName, null, new CancellationToken()).Await().AsTask.Result;
+            _version = AssemblyContext.StreamStore.WriteAsync(_streamName, _causationIdTwo, new[] { _eventTwo }, _segment.Version, new CancellationToken()).Await().AsTask.Result;
+            _segment = AssemblyContext.StreamStore.ReadAsync<IEvent, IState>(_streamName, _causationIdOne, null, new CancellationToken()).Await().AsTask.Result;
         };
 
-        private It should_have_both_events_in_the_segment = () => _segment.Items.ShouldContain(_eventOne, _eventTwo);
+        private It should_have_both_events_in_the_segment = () => _segment.StreamItems.ShouldContain(_eventOne, _eventTwo);
 
         private It should_have_the_event_entity_in_the_version = () =>
         {
@@ -37,5 +39,7 @@ namespace Edit.AzureTableStorage.IntegrationTests.StreamStore
         private static EventOne _eventOne;
         private static EventTwo _eventTwo;
         private static IVersion _version;
+        private static string _causationIdOne;
+        private static string _causationIdTwo;
     }
 }

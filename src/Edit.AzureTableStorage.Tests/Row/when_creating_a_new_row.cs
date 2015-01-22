@@ -9,7 +9,8 @@ namespace Edit.AzureTableStorage.Tests.Row
         {
             _streamName = "agg1";
             _sequence = 1;
-            _row = new BatchOperationRow(_streamName, _sequence, false);
+            _sequencePrefix = "test";
+            _row = new BatchOperationRow(_streamName, _sequencePrefix, _sequence, false);
         };
 
         private It should_have_one_column = () => _row.Columns.Count().ShouldEqual(1);
@@ -24,8 +25,11 @@ namespace Edit.AzureTableStorage.Tests.Row
 
         private It should_have_a_sequence = () => _row.Sequence.ShouldEqual(_sequence);
 
+        private It should_have_a_sequence_prefix = () => _row.SequencePrefix.ShouldEqual(_sequencePrefix);
+
         private static BatchOperationRow _row;
         private static string _streamName;
         private static long _sequence;
+        private static string _sequencePrefix;
     }
 }

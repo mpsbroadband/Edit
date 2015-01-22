@@ -16,7 +16,7 @@ namespace Edit.AzureTableStorage.Tests.Writer
                                             _existingData = new byte[] {1, 2, 3};
                                             _existingEntities = new []
                                                                     {
-                                                                        new DynamicTableEntity(_streamName, "1", "etag1",
+                                                                        new DynamicTableEntity(_streamName, "test-1", "etag1",
                                                                              new Dictionary<string, EntityProperty>
                                                                                  {
                                                                                      {
@@ -24,7 +24,7 @@ namespace Edit.AzureTableStorage.Tests.Writer
                                                                                          new EntityProperty(_existingData)
                                                                                      }
                                                                                  }),
-                                                                        new DynamicTableEntity(_streamName, "2", "etag2",
+                                                                        new DynamicTableEntity(_streamName, "test-2", "etag2",
                                                                              new Dictionary<string, EntityProperty>
                                                                                  {
                                                                                      {
@@ -33,7 +33,7 @@ namespace Edit.AzureTableStorage.Tests.Writer
                                                                                      }
                                                                                  })
                                                                     };
-                                            _writer = new BatchOperationWriter(_streamName, _existingEntities, false);
+                                            _writer = new BatchOperationWriter(_streamName, "test", _existingEntities, false);
                                             _stream = new MemoryStream(_dataToWrite);
                                             _writer.Write(_stream);
                                         };

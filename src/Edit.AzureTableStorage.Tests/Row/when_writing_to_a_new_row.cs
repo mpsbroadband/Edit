@@ -7,7 +7,7 @@ namespace Edit.AzureTableStorage.Tests.Row
     {
         private Establish context = () =>
         {
-            _row = new BatchOperationRow("agg1", 1, false);
+            _row = new BatchOperationRow("agg1", "test", 1, false);
             _data = new byte[] { 1, 2, 3 };
         };
 

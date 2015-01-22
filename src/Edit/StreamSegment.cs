@@ -5,11 +5,13 @@ namespace Edit
     public sealed class StreamSegment<T>
     {
         public IVersion Version { get; private set; }
-        public IEnumerable<T> Items { get; private set; }
+        public IEnumerable<T> StreamItems { get; private set; }
+        public IEnumerable<T> CausationItems { get; private set; }
 
-        public StreamSegment(IEnumerable<T> items, IVersion version)
+        public StreamSegment(IEnumerable<T> streamItems, IEnumerable<T> causationItems, IVersion version)
         {
-            Items = new List<T>(items);
+            StreamItems = new List<T>(streamItems);
+            CausationItems = causationItems;
             Version = version;
         }
     }

@@ -11,7 +11,7 @@ namespace Edit.AzureTableStorage.Tests.Row
     {
         private Establish context = () =>
         {
-            _entity = new DynamicTableEntity("agg1", "1", "etag",
+            _entity = new DynamicTableEntity("agg1", "test-1", "etag",
                                              new Dictionary<string, EntityProperty>
                                                  {
                                                      {

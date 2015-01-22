@@ -16,7 +16,7 @@ namespace Edit.AzureTableStorage.Tests.Writer
                                             _existingData = new byte[] {1, 2, 3};
                                             _existingEntities = new []
                                                                     {
-                                                                        new DynamicTableEntity(_streamName, "1", "etag",
+                                                                        new DynamicTableEntity(_streamName, "test-1", "etag",
                                                                              new Dictionary<string, EntityProperty>
                                                                                  {
                                                                                      {
@@ -25,7 +25,7 @@ namespace Edit.AzureTableStorage.Tests.Writer
                                                                                      }
                                                                                  })
                                                                     };
-                                            _writer = new BatchOperationWriter(_streamName, _existingEntities, false);
+                                            _writer = new BatchOperationWriter(_streamName, "test", _existingEntities, false);
                                             _stream = new MemoryStream(_dataToWrite);
                                         };
 
