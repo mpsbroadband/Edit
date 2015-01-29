@@ -11,7 +11,7 @@ namespace Edit
         public StreamSegment(IEnumerable<T> streamItems, IEnumerable<T> causationItems, IVersion version)
         {
             StreamItems = new List<T>(streamItems);
-            CausationItems = causationItems;
+            CausationItems = new List<T>(causationItems);
             Version = version;
         }
     }
