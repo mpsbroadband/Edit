@@ -37,7 +37,7 @@ namespace Edit.AzureTableStorage.Tests.Version
 
         private Because of = () =>
                                  {
-                                     _version = new TableStorageVersion(_entities);
+                                     _version = new TableStorageVersion(_partitionKey, _entities);
                                  };
 
         private It should_set_partition_key_to_entity_partition_key = () => _version.PartitionKey.ShouldEqual(_partitionKey);

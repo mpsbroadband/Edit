@@ -10,19 +10,19 @@ namespace Edit.AzureTableStorage
 {
     public class TableStorageStreamStore : IStreamStore
     {
-        private const string StreamSequencePrefix = "stream";
-        private const string CausationSequencePrefix = "causation";
+        internal const string StreamSequencePrefix = "stream";
+        internal const string CausationSequencePrefix = "causation";
 
         private readonly ITableOperationSerializer _serializer;
         private readonly CloudTableClient _client;
         private readonly CloudTable _table;
         private readonly bool _developmentStorage;
 
-        public TableStorageStreamStore(ITableOperationSerializer serializer, CloudStorageAccount storageAccount)
+        public TableStorageStreamStore(ITableOperationSerializer serializer, CloudStorageAccount storageAccount, string tableName = "StreamStore")
         {
             _serializer = serializer;
             _client = storageAccount.CreateCloudTableClient();
-            _table = _client.GetTableReference("StreamStore");
+            _table = _client.GetTableReference(tableName);
             _table.CreateIfNotExists();
 
             _developmentStorage = _client.BaseUri == CloudStorageAccount.DevelopmentStorageAccount
@@ -51,7 +51,7 @@ namespace Edit.AzureTableStorage
                 var result = await _table.ExecuteBatchAsync(batch, token);
 
                 return
-                    new TableStorageVersion(
+                    new TableStorageVersion(streamName,
                         result.Select(r => (DynamicTableEntity) r.Result)
                             .Where(e => e.RowKey.StartsWith(StreamSequencePrefix)));
             }
@@ -71,11 +71,15 @@ namespace Edit.AzureTableStorage
                                         TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, streamName), 
                                         "and", 
                                         TableQuery.GenerateFilterCondition("RowKey", QueryComparisons.GreaterThanOrEqual, streamRowKey));
-            var causationRowKey = BatchOperationRow.FormatRowKey(string.Concat(CausationSequencePrefix, "-", causationId), 0);
+            var causationRowKeyStart = BatchOperationRow.FormatRowKey(string.Concat(CausationSequencePrefix, "-", causationId), 0);
+            var causationRowKeyEnd = BatchOperationRow.FormatRowKey(string.Concat(CausationSequencePrefix, "-", causationId), 1000);
             var causationFilter = TableQuery.CombineFilters(
                                         TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, streamName),
                                         "and",
-                                        TableQuery.GenerateFilterCondition("RowKey", QueryComparisons.GreaterThanOrEqual, causationRowKey));
+                                        TableQuery.CombineFilters(
+                                            TableQuery.GenerateFilterCondition("RowKey", QueryComparisons.GreaterThanOrEqual, causationRowKeyStart),
+                                            "and",
+                                            TableQuery.GenerateFilterCondition("RowKey", QueryComparisons.LessThanOrEqual, causationRowKeyEnd)));
             var filter = TableQuery.CombineFilters(streamFilter, "or", causationFilter);
             var continuationToken = new TableContinuationToken();
             var entities = new List<DynamicTableEntity>();
@@ -97,7 +101,7 @@ namespace Edit.AzureTableStorage
                                     entities.Where(e => e.RowKey.StartsWith(CausationSequencePrefix)), null, 0);
 
             return new StreamSegment<T>(streamItems, causationItems,
-                new TableStorageVersion(entities.Where(e => e.RowKey.StartsWith(StreamSequencePrefix))));
+                new TableStorageVersion(streamName, entities.Where(e => e.RowKey.StartsWith(StreamSequencePrefix))));
         }
     }
 }

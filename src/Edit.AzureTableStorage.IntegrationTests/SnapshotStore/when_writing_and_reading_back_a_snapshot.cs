@@ -21,7 +21,7 @@ namespace Edit.AzureTableStorage.IntegrationTests.SnapshotStore
                                             _eventTwo = new EventTwo("value2");
                                             _state.Apply(_eventOne);
                                             _state.Apply(_eventTwo);
-                                            _version = new TableStorageVersion(new List<DynamicTableEntity>
+                                            _version = new TableStorageVersion(_streamName, new List<DynamicTableEntity>
                                                             {
                                                                 new DynamicTableEntity(_streamName, _rowKey, _etag,
                                                                                        new Dictionary

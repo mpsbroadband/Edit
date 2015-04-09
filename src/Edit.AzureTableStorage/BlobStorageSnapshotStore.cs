@@ -12,11 +12,11 @@ namespace Edit.AzureTableStorage
         private readonly CloudBlobClient _client;
         private readonly CloudBlobContainer _container;
 
-        public BlobStorageSnapshotStore(ISerializer serializer, CloudStorageAccount storageAccount)
+        public BlobStorageSnapshotStore(ISerializer serializer, CloudStorageAccount storageAccount, string containerName = "snapshot-store")
         {
             _serializer = serializer;
             _client = storageAccount.CreateCloudBlobClient();
-            _container = _client.GetContainerReference("snapshot-store");
+            _container = _client.GetContainerReference(containerName);
             _container.CreateIfNotExists();
         }
 

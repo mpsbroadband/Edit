@@ -7,14 +7,25 @@ namespace Edit.AzureTableStorage
 {
     public class TableStorageVersion : IVersion
     {
-        public TableStorageVersion(IEnumerable<DynamicTableEntity> entities)
+        public TableStorageVersion(string partitionKey, IEnumerable<DynamicTableEntity> entities)
         {
             Entities = new ReadOnlyCollection<DynamicTableEntity>(entities.ToList());
-            PartitionKey = Entities.Last().PartitionKey;
-            RowKey = Entities.Last().RowKey;
-            Column = Entities.Last().Properties.OrderBy(p => p.Key).Last().Key;
-            Position = Entities.Last().Properties.OrderBy(p => p.Key).Last().Value.BinaryValue.Length;
             ETag = Entities.Select(e => e.ETag).LastOrDefault() ?? string.Empty;
+            PartitionKey = partitionKey;
+
+            if (Entities.Any())
+            {
+                var last = Entities.Last();
+                RowKey = last.RowKey;
+                Column = last.Properties.OrderBy(p => p.Key).Last().Key;
+                Position = last.Properties.OrderBy(p => p.Key).Last().Value.BinaryValue.Length;
+            }
+            else
+            {
+                RowKey = BatchOperationRow.FormatRowKey(TableStorageStreamStore.StreamSequencePrefix, 0);
+                Column = BatchOperationRow.FormatColumnName(0);
+                Position = 0;
+            }
         }
 
         public IEnumerable<DynamicTableEntity> Entities { get; private set; }

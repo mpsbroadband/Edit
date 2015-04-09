@@ -91,7 +91,7 @@ namespace Edit.AzureTableStorage
             var columnSequence = 0;
             var entity = new DynamicTableEntity(StreamName,
                 FormatRowKey(SequencePrefix, Sequence), ETag,
-                Columns.ToDictionary(c => string.Format("d{0}", columnSequence++), c => c.ToProperty()));
+                Columns.ToDictionary(c => FormatColumnName(columnSequence++), c => c.ToProperty()));
             
             if (string.IsNullOrEmpty(ETag))
             {
@@ -134,6 +134,11 @@ namespace Edit.AzureTableStorage
         public static string FormatRowKey(string sequencePrefix, long sequence)
         {
             return string.Concat(sequencePrefix, "-", sequence.ToString(CultureInfo.InvariantCulture));
+        }
+
+        public static string FormatColumnName(long sequence)
+        {
+            return string.Format("d{0}", sequence);
         }
     }
 }
