@@ -17,8 +17,8 @@ namespace Edit.AzureTableStorage
             {
                 var last = Entities.Last();
                 RowKey = last.RowKey;
-                Column = last.Properties.OrderBy(p => p.Key).Last().Key;
-                Position = last.Properties.OrderBy(p => p.Key).Last().Value.BinaryValue.Length;
+                Column = last.Properties.OrderByAlphaNumeric(p => p.Key).Last().Key;
+                Position = last.Properties.OrderByAlphaNumeric(p => p.Key).Last().Value.BinaryValue.Length;
             }
             else
             {

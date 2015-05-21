@@ -40,7 +40,7 @@ namespace Edit.AzureTableStorage
         {
             using (var stream = new MemoryStream())
             {
-                foreach (var property in entities.SelectMany(e => e.Properties.OrderBy(p => p.Key)))
+                foreach (var property in entities.SelectMany(e => e.Properties.OrderByAlphaNumeric(p => p.Key)))
                 {
                     var data = property.Value.BinaryValue;
 

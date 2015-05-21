@@ -33,7 +33,7 @@ namespace Edit.AzureTableStorage
             _developmentStorage = developmentStorage;
             _streamName = entity.PartitionKey;
             _etag = entity.ETag;
-            _columns = entity.Properties.Select(p => new BatchOperationColumn(p.Value)).ToList();
+            _columns = entity.Properties.OrderByAlphaNumeric(e => e.Key).Select(p => new BatchOperationColumn(p.Value)).ToList();
 
             var match = Regex.Match(entity.RowKey, @"(.*)-(\d+)");
 
