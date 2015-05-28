@@ -53,7 +53,7 @@ namespace Edit.AzureTableStorage
                 return
                     new TableStorageVersion(streamName,
                         result.Select(r => (DynamicTableEntity) r.Result)
-                            .Where(e => e.RowKey.StartsWith(StreamSequencePrefix)));
+                            .Where(e => e.RowKey.StartsWith(StreamSequencePrefix)).OrderByAlphaNumeric(e => e.RowKey));
             }
             catch (StorageException)
             {
@@ -61,7 +61,7 @@ namespace Edit.AzureTableStorage
             }
         }
 
-        public async Task<StreamSegment<T>> ReadAsync<T, TSnapshot>(string streamName, string causationId, ISnapshotEnvelope<TSnapshot> snapshot, CancellationToken cancellationToken) where T : class
+        public async Task<StreamSegment<T>> ReadAsync   <T, TSnapshot>(string streamName, string causationId, ISnapshotEnvelope<TSnapshot> snapshot, CancellationToken cancellationToken) where T : class
         {
             var tableSnapshot = snapshot as TableStorageSnapshotEnvelope<TSnapshot>;
             var streamRowKey = tableSnapshot != null
@@ -91,6 +91,8 @@ namespace Edit.AzureTableStorage
                 entities.AddRange(result.Results);
                 continuationToken = result.ContinuationToken;
             }
+
+            entities = entities.OrderByAlphaNumeric(e => e.RowKey).ToList();
 
             var streamItems = _serializer.Deserialize<T>(
                                     entities.Where(e => e.RowKey.StartsWith(StreamSequencePrefix)), 
