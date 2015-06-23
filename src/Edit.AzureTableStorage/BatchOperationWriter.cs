@@ -70,7 +70,8 @@ namespace Edit.AzureTableStorage
                     }
                     else
                     {
-                        _rows.Add(new BatchOperationRow(StreamName, _sequencePrefix, _rows.Count, _developmentStorage));
+                        _rows.Add(new BatchOperationRow(StreamName, _sequencePrefix, _rows.Max(r => r.Sequence) + 1,
+                            _developmentStorage));
                     }
                 }
             }
