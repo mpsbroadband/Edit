@@ -84,13 +84,38 @@ namespace Edit.AzureTableStorage
             var continuationToken = new TableContinuationToken();
             var entities = new List<DynamicTableEntity>();
 
-            while (continuationToken != null)
+            if (tableSnapshot != null)
             {
-                var result = await _table.ExecuteQuerySegmentedAsync(
-                                        new TableQuery {FilterString = filter}, continuationToken, cancellationToken);
-                entities.AddRange(result.Results);
-                continuationToken = result.ContinuationToken;
+                var index = Convert.ToInt64(tableSnapshot.RowKey.Split('-')[1]);
+                var count = 0;
+                do
+                {
+                   streamFilter = TableQuery.CombineFilters(
+                                            TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, streamName),
+                                            "and",
+                                            TableQuery.GenerateFilterCondition("RowKey", QueryComparisons.Equal, BatchOperationRow.FormatRowKey(StreamSequencePrefix, index++)));
+                    var result = await _table.ExecuteQuerySegmentedAsync(
+                                            new TableQuery { FilterString = streamFilter }, new TableContinuationToken(), cancellationToken);
+                    entities.AddRange(result.Results);
+                    count = result.Results.Count;
+                } while (count > 0);
+
+                while (continuationToken != null)
+                {
+                    var result = await _table.ExecuteQuerySegmentedAsync(
+                                            new TableQuery { FilterString = causationFilter }, continuationToken, cancellationToken);
+                    entities.AddRange(result.Results);
+                    continuationToken = result.ContinuationToken;
+                }
             }
+            else
+                while (continuationToken != null)
+                {
+                    var result = await _table.ExecuteQuerySegmentedAsync(
+                                            new TableQuery { FilterString = filter }, continuationToken, cancellationToken);
+                    entities.AddRange(result.Results);
+                    continuationToken = result.ContinuationToken;
+                }
 
             entities = entities.OrderByAlphaNumeric(e => e.RowKey).ToList();
 
