@@ -88,16 +88,29 @@ namespace Edit.AzureTableStorage
             {
                 var index = Convert.ToInt64(tableSnapshot.RowKey.Split('-')[1]);
                 var count = 0;
+                const int lap = 10;
                 do
                 {
-                   streamFilter = TableQuery.CombineFilters(
-                                            TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, streamName),
-                                            "and",
-                                            TableQuery.GenerateFilterCondition("RowKey", QueryComparisons.Equal, BatchOperationRow.FormatRowKey(StreamSequencePrefix, index++)));
-                    var result = await _table.ExecuteQuerySegmentedAsync(
-                                            new TableQuery { FilterString = streamFilter }, new TableContinuationToken(), cancellationToken);
-                    entities.AddRange(result.Results);
-                    count = result.Results.Count;
+                    var streamContinuationToken = new TableContinuationToken();
+                    var filterCondition = string.Empty;
+                    for (var i = index; i < index + lap; i++)
+                    {
+                        filterCondition += TableQuery.GenerateFilterCondition("RowKey", QueryComparisons.Equal,
+                            BatchOperationRow.FormatRowKey(StreamSequencePrefix, i)) + (i == index + lap - 1 ? "" : " or ");
+                    }
+                    index += lap;
+                    streamFilter = TableQuery.CombineFilters(
+                                             TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, streamName),
+                                             "and", filterCondition);
+                    while (streamContinuationToken != null)
+                    {
+                        var result = await _table.ExecuteQuerySegmentedAsync(
+                                                new TableQuery { FilterString = streamFilter }, streamContinuationToken, cancellationToken);
+                        entities.AddRange(result.Results);
+                        count = result.Results.Count;
+                        streamContinuationToken = result.ContinuationToken;
+                    }
+
                 } while (count > 0);
 
                 while (continuationToken != null)
