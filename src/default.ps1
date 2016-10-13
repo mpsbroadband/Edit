@@ -11,7 +11,7 @@ Properties {
 	$TargetProfile = "Cloud"
 	$BuildCounter = $null
 	$LocalRepository = ($env:LOCALAPPDATA + "\.bacon")
-	$BuildRepository = "http://build.mpsdev.com/httpAuth/app/nuget/v1/FeedService.svc/"
+	$BuildRepository = $env:Teamcity_nuget_feed
 	$SkipTests = $false
 	$BaconDll = "$PSScriptRoot\Build\Bacon.dll"
 	[string[]]$RemoteRepositories = $BuildRepository, "https://packages.nuget.org/api/v2"
