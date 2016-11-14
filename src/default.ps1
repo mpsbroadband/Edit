@@ -11,10 +11,18 @@ Properties {
 	$TargetProfile = "Cloud"
 	$BuildCounter = $null
 	$LocalRepository = ($env:LOCALAPPDATA + "\.bacon")
-	$BuildRepository = "http://devbuild.mpsdev.com/httpAuth/app/nuget/v1/FeedService.svc/"
+	if($env:Teamcity_nuget_feed){
+		$BuildRepository = $env:Teamcity_nuget_feed
+	}
+	else{
+		$BuildRepository = "http://build.mpsdev.com/httpAuth/app/nuget/v1/FeedService.svc/"
+	}
+	$BuildRepositoryDev = "http://devbuild.mpsdev.com/httpAuth/app/nuget/v1/FeedService.svc/"
 	$SkipTests = $false
 	$BaconDll = "$PSScriptRoot\Build\Bacon.dll"
 	[string[]]$RemoteRepositories = $BuildRepository, "https://packages.nuget.org/api/v2"
+	[string[]]$RemoteRepositoriesDev = $BuildRepositoryDev, "https://packages.nuget.org/api/v2"
+	$MajorMinorVersion = "%system.MajorMinorVersion%"
 	if ($env:Teamcity_dotCover_home -ne $null){
 		$dotCover=$env:Teamcity_dotCover_home+ "\dotCover.exe"
 	}
@@ -32,8 +40,8 @@ Task Init {
 	if ($BuildCounter -eq $null) {
 		$script:Version = (Get-Date -Format "yyyyMMdd.HHmm.ss")
 	} else {
-		$script:Version = "1.0.$BuildCounter"
-	}
+ 		$script:Version = "$MajorMinorVersion.$BuildCounter"
+ 	}
 	
 	Write-Host "Solution:`t$SolutionFile" -ForegroundColor Gray
 	Write-Host "Configuration:`t$Configuration" -ForegroundColor Gray
