@@ -22,7 +22,7 @@ Properties {
 	$BaconDll = "$PSScriptRoot\Build\Bacon.dll"
 	[string[]]$RemoteRepositories = $BuildRepository, "https://packages.nuget.org/api/v2"
 	[string[]]$RemoteRepositoriesDev = $BuildRepositoryDev, "https://packages.nuget.org/api/v2"
-	$MajorMinorVersion = "%system.MajorMinorVersion%"
+	$MajorMinorVersion = $env.MajorMinorVersion
 	if ($env:Teamcity_dotCover_home -ne $null){
 		$dotCover=$env:Teamcity_dotCover_home+ "\dotCover.exe"
 	}
