@@ -55,6 +55,29 @@ Task Init {
 	Import-Module $baconDll -DisableNameChecking -Scope Global
 }
 
+Task InitDev {
+	if ($BuildCounter -eq $null) {
+		$script:Version = (Get-Date -Format "yyyyMMdd.HHmm.ss")
+	} else {
+		$script:Version = "1.0.$BuildCounter"
+	}
+	
+	Write-Host "Solution:`t$SolutionFile" -ForegroundColor Gray
+	Write-Host "Configuration:`t$Configuration" -ForegroundColor Gray
+	Write-Host "Version:`t$Version" -ForegroundColor Gray
+
+	if ($env:TEAMCITY_VERSION) {
+		TeamCity-SetBuildNumber $Version
+	}
+	
+	Bacon-Init $BuildRepositoryDev "MPSDev" $BaconDll
+	Import-Module $baconDll -DisableNameChecking -Scope Global
+}
+
+Task RestoreDev -Depends InitDev {
+    Restore-Solution -SolutionFile $SolutionFile -LocalRepository $LocalRepository -RemoteRepositories $RemoteRepositoriesDev | Out-Null
+}
+
 Task Clean -Depends Init {
 	if (Test-Path $LocalRepository) {
 		Remove-Item -Recurse -Force $LocalRepository 

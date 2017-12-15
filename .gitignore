@@ -172,3 +172,4 @@ src/Build/*.InstallState
 Dependencies
 *.InstallLog
 *.InstallState
+*.targets
