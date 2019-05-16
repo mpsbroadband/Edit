@@ -1,5 +1,6 @@
 ﻿using System.Globalization;
 using System.Reflection;
+using AzureApi.Storage.Table;
 using Machine.Specifications;
 using Microsoft.WindowsAzure.Storage.Table;
 

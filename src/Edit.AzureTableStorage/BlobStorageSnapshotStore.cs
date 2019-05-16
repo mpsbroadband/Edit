@@ -9,14 +9,13 @@ namespace Edit.AzureTableStorage
     public class BlobStorageSnapshotStore : ISnapshotStore
     {
         private readonly ISerializer _serializer;
-        private readonly CloudBlobClient _client;
         private readonly CloudBlobContainer _container;
 
         public BlobStorageSnapshotStore(ISerializer serializer, CloudStorageAccount storageAccount, string containerName = "snapshot-store")
         {
             _serializer = serializer;
-            _client = storageAccount.CreateCloudBlobClient();
-            _container = _client.GetContainerReference(containerName);
+            var client = storageAccount.CreateCloudBlobClient();
+            _container = client.GetContainerReference(containerName);
             _container.CreateIfNotExists();
         }
 
@@ -24,17 +23,15 @@ namespace Edit.AzureTableStorage
         {
             var reference = _container.GetBlockBlobReference(id);
 
-            if (await reference.ExistsAsync())
+            if (await reference.ExistsAsync(token))
             {
                 using (var stream = await reference.OpenReadAsync(token))
                 {
                     return _serializer.Deserialize<ISnapshotEnvelope<T>>(stream);
                 }
             }
-            else
-            {
-                return null;
-            }
+
+            return null;
         }
 
         public async Task WriteAsync<T>(string id, T snapshot, IVersion version, CancellationToken token)

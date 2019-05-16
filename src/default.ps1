@@ -74,10 +74,6 @@ Task InitDev {
 	Import-Module $baconDll -DisableNameChecking -Scope Global
 }
 
-Task RestoreDev -Depends InitDev {
-    Restore-Solution -SolutionFile $SolutionFile -LocalRepository $LocalRepository -RemoteRepositories $RemoteRepositoriesDev | Out-Null
-}
-
 Task Clean -Depends Init {
 	if (Test-Path $LocalRepository) {
 		Remove-Item -Recurse -Force $LocalRepository 
@@ -94,6 +90,10 @@ Task Clean -Depends Init {
 
 Task Restore -Depends Init {
     Restore-Solution -SolutionFile $SolutionFile -LocalRepository $LocalRepository -RemoteRepositories $RemoteRepositories | Out-Null
+}
+
+Task RestoreDev -Depends InitDev {
+    Restore-Solution -SolutionFile $SolutionFile -LocalRepository $LocalRepository -RemoteRepositories $RemoteRepositoriesDev | Out-Null
 }
 
 Task Build -Depends Restore {
