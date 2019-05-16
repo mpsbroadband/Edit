@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Reflection;
+using AzureApi.Storage.Table;
 using Machine.Specifications;
 using Microsoft.WindowsAzure.Storage.Table;
 

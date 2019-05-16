@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using AzureApi.Storage.Table;
 using Machine.Specifications;
 
 namespace Edit.AzureTableStorage.Tests.Row

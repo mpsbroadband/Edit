@@ -21,7 +21,6 @@ namespace Edit.AzureTableStorage.IntegrationTests.StreamStore
         private It should_return_the_written_version = () => _version.ShouldEqual(_segment.Version);
 
         private static string _streamName;
-        private static EventOne _event;
         private static StreamSegment<IEvent> _segment;
         private static IVersion _version;
         private static string _causationId;

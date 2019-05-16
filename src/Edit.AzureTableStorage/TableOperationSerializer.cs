@@ -2,6 +2,7 @@
 using Microsoft.WindowsAzure.Storage.Table;
 using System.Collections.Generic;
 using System.IO;
+using AzureApi.Storage.Table;
 
 namespace Edit.AzureTableStorage
 {
@@ -65,7 +66,7 @@ namespace Edit.AzureTableStorage
 
                 while ((read = stream.Read(buffer, 0, buffer.Length)) > 0)
                 {
-                    for (int i = 0; i < read; i++)
+                    for (var i = 0; i < read; i++)
                     {
                         var b = buffer[i];
                         if (b != Delimeter)

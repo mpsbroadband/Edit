@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using AzureApi.Storage.Table;
 using Microsoft.WindowsAzure.Storage.Table;
 
 namespace Edit.AzureTableStorage
@@ -70,7 +71,7 @@ namespace Edit.AzureTableStorage
         {
             unchecked
             {
-                var hashCode = (PartitionKey != null ? PartitionKey.GetHashCode() : 0);
+                var hashCode = PartitionKey != null ? PartitionKey.GetHashCode() : 0;
 
                 hashCode = (hashCode*397) ^ (RowKey != null ? RowKey.GetHashCode() : 0);
                 hashCode = (hashCode*397) ^ (Column != null ? Column.GetHashCode() : 0);

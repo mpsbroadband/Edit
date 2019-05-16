@@ -57,7 +57,6 @@ namespace Edit.AzureTableStorage.IntegrationTests.SnapshotStore
         private It should_have_position_in_envelope = () => _envelope.Position.ShouldEqual(_version.Position);
 
         private static string _streamName;
-        private static EventOne _event;
         private static StateOne _state;
         private static EventOne _eventOne;
         private static EventTwo _eventTwo;
