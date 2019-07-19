@@ -1,4 +1,5 @@
-﻿using Machine.Specifications;
+﻿using AzureApi.Storage.Table;
+using Machine.Specifications;
 
 namespace Edit.AzureTableStorage.Tests.Column
 {

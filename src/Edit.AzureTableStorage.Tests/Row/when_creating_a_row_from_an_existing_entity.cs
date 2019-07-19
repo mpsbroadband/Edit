@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using AzureApi.Storage.Table;
 using Machine.Specifications;
 using Microsoft.WindowsAzure.Storage.Table;
 

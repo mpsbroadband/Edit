@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using AzureApi.Storage.Table;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
 
@@ -14,18 +15,17 @@ namespace Edit.AzureTableStorage
         internal const string CausationSequencePrefix = "causation";
 
         private readonly ITableOperationSerializer _serializer;
-        private readonly CloudTableClient _client;
         private readonly CloudTable _table;
         private readonly bool _developmentStorage;
 
         public TableStorageStreamStore(ITableOperationSerializer serializer, CloudStorageAccount storageAccount, string tableName = "StreamStore")
         {
             _serializer = serializer;
-            _client = storageAccount.CreateCloudTableClient();
-            _table = _client.GetTableReference(tableName);
+            var client = storageAccount.CreateCloudTableClient();
+            _table = client.GetTableReference(tableName);
             _table.CreateIfNotExists();
 
-            _developmentStorage = _client.BaseUri == CloudStorageAccount.DevelopmentStorageAccount
+            _developmentStorage = client.BaseUri == CloudStorageAccount.DevelopmentStorageAccount
                                                                         .CreateCloudTableClient()
                                                                         .BaseUri;
         }

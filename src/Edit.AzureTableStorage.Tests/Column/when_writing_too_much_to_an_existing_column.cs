@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Linq;
+using AzureApi.Storage.Table;
 using Machine.Specifications;
 using Microsoft.WindowsAzure.Storage.Table;
 

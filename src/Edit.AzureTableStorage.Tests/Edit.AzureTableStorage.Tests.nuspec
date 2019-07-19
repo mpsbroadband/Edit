@@ -7,7 +7,8 @@
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
         <description>Edit.AzureTableStorage</description>
 	    <dependencies>
-			<dependency id="Machine.Specifications" version="[0.8.1]" />
+			<dependency id="Machine.Specifications" version="[0.9.0]" /> 
+			<dependency id="Machine.Specifications.Runner.Console" version="[0.9.0]" /> 
 			<dependency id="Machine.Specifications.Should" version="[0.7.1]" />
 	    </dependencies>
     </metadata>
