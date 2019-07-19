@@ -172,4 +172,5 @@ src/Build/*.InstallState
 Dependencies
 *.InstallLog
 *.InstallState
+*.targets
 src/\.vs/Edit/v15/Server/sqlite3/

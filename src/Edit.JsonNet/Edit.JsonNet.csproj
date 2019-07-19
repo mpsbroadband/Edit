@@ -32,13 +32,10 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <Import Project=".\Edit.JsonNet.Dependencies.targets" />
   <ItemGroup>
     <Reference Include="System.Core" />
     <Reference Include="System.Xml" />
-    <Reference Include="Newtonsoft.Json">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Newtonsoft.Json.6.0.8\lib\net45\Newtonsoft.Json.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="JsonNetSerializer.cs" />
@@ -61,4 +58,7 @@
   <Target Name="AfterBuild">
   </Target>
   -->
+  <ItemGroup>
+    <None Include="Edit.JsonNet.Dependencies.targets" />
+  </ItemGroup>
 </Project>
