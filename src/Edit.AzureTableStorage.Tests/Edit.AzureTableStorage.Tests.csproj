@@ -107,6 +107,11 @@
     <Compile Include="Row\when_writing_to_a_new_row.cs" />
     <Compile Include="Row\when_creating_a_row_from_an_existing_entity.cs" />
     <Compile Include="Row\when_creating_a_new_row.cs" />
+    <Compile Include="Serialize\IA.cs" />
+    <Compile Include="Serialize\IB.cs" />
+    <Compile Include="Serialize\Type1.cs" />
+    <Compile Include="Serialize\Type2.cs" />
+    <Compile Include="Serialize\when_deserializing.cs" />
     <Compile Include="Version\when_creating_a_version_from_zero_entities.cs" />
     <Compile Include="Version\when_creating_a_version_from_a_single_entity_with_multiple_properties.cs" />
     <Compile Include="Version\when_creating_a_version_from_multiple_entities.cs" />

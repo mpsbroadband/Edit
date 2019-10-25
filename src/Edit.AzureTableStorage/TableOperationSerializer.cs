@@ -81,15 +81,16 @@ namespace Edit.AzureTableStorage
                 }
 
                 return streams.Where(s => s.Length > 0)
-                              .Select(s =>
-                                          {
-                                              using (s)
-                                              {
-                                                  s.Position = 0;
-                                                  return _serializer.Deserialize<T>(s);
-                                              }
-                                          })
-                              .ToList();
+                    .Select(s =>
+                    {
+                        using (s)
+                        {
+                            s.Position = 0;
+                            return _serializer.Deserialize<object>(s);
+                        }
+                    })
+                    .OfType<T>()
+                    .ToList();
             }
         }
     }
