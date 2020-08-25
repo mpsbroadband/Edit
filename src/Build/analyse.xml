@@ -1,0 +1,43 @@
+<CoverageParams>
+  <TargetExecutable>C:\Users\Anas\Documents\GitHub\CommonDomain\src\packages\Machine.Specifications.0.8.1\tools\mspec-clr4.exe</TargetExecutable>
+  <TargetArguments>C:\Users\Anas\Documents\GitHub\CommonDomain\src\Bus.Tests\Target\bin\Bus.Tests.dll C:\Users\Anas\Documents\GitHub\CommonDomain\src\CommonDomainLibrary.Tests\Target\bin\CommonDomainLibrary.Tests.dll C:\Users\Anas\Documents\GitHub\CommonDomain\src\CommonInfrastructureLibrary.Tests\Target\bin\CommonInfrastructureLibrary.Tests.dll C:\Users\Anas\Documents\GitHub\CommonDomain\src\CommonReadModelLibrary.Tests\Target\bin\CommonReadModelLibrary.Tests.dll C:\Users\Anas\Documents\GitHub\CommonDomain\src\CommonWebServiceLibrary.Tests\Target\bin\CommonWebServiceLibrary.Tests.dll C:\Users\Anas\Documents\GitHub\CommonDomain\src\EventStore.Tests\Target\bin\EventStore.Tests.dll</TargetArguments>
+  <TargetWorkingDir>C:\Users\Anas\Documents\GitHub\CommonDomain\src</TargetWorkingDir>
+  <Output>F:\temp\dotCover\CD\20140923.1753.34.dcvr</Output>
+  <Filters>
+    <IncludeFilters>
+      <FilterEntry>
+        <ModuleMask>*</ModuleMask>
+        <ClassMask>*</ClassMask>
+        <FunctionMask>*</FunctionMask>
+      </FilterEntry>
+    </IncludeFilters>
+    <ExcludeFilters>
+      <FilterEntry>
+        <ModuleMask>*Raven*</ModuleMask>
+        <ClassMask>*</ClassMask>
+        <FunctionMask>*</FunctionMask>
+      </FilterEntry>
+      <FilterEntry>
+        <ModuleMask>*Esent*</ModuleMask>
+        <ClassMask>*</ClassMask>
+        <FunctionMask>*</FunctionMask>
+      </FilterEntry>
+      <FilterEntry>
+        <ModuleMask>*Lucene*</ModuleMask>
+        <ClassMask>*</ClassMask>
+        <FunctionMask>*</FunctionMask>
+      </FilterEntry>
+      <FilterEntry>
+        <ModuleMask>*Spatial4n*</ModuleMask>
+        <ClassMask>*</ClassMask>
+        <FunctionMask>*</FunctionMask>
+      </FilterEntry>
+      <FilterEntry>
+        <ModuleMask>*Edit*</ModuleMask>
+        <ClassMask>*</ClassMask>
+        <FunctionMask>*</FunctionMask>
+      </FilterEntry>
+    </ExcludeFilters>
+  </Filters>
+  <ReportType>xml</ReportType>
+</CoverageParams>

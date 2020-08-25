@@ -75,6 +75,7 @@
     <Reference Include="AzureApi.Storage">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\AzureApi.Storage.1.1.8\lib\net45\AzureApi.Storage.dll</HintPath>
+      <Private>True</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>
