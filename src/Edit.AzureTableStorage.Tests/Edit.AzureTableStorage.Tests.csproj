@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Edit.AzureTableStorage.Tests</RootNamespace>
     <AssemblyName>Edit.AzureTableStorage.Tests</AssemblyName>
-    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -47,14 +47,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\NLog.2.1.0\lib\net45\NLog.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Newtonsoft.Json.6.0.8\lib\net45\Newtonsoft.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Data.OData">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Microsoft.Data.OData.5.6.5-beta\lib\net40\Microsoft.Data.OData.dll</HintPath>
-    </Reference>
     <Reference Include="System.Spatial">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\System.Spatial.5.6.5-beta\lib\net40\System.Spatial.dll</HintPath>
@@ -77,7 +69,7 @@
     </Reference>
     <Reference Include="AzureApi.Storage">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\AzureApi.Storage.1.1.8\lib\net45\AzureApi.Storage.dll</HintPath>
+      <HintPath>..\packages\AzureApi.Storage.1.0.113\lib\net45\AzureApi.Storage.dll</HintPath>
     </Reference>
     <Reference Include="Machine.Specifications.Clr4">
       <SpecificVersion>False</SpecificVersion>

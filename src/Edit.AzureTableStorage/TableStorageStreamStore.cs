@@ -18,12 +18,17 @@ namespace Edit.AzureTableStorage
         private readonly CloudTable _table;
         private readonly bool _developmentStorage;
 
+        private async Task<CloudTable> GetTable()
+        {
+            await _table.CreateIfNotExistsAsync();
+            return _table;
+        }
+
         public TableStorageStreamStore(ITableOperationSerializer serializer, CloudStorageAccount storageAccount, string tableName = "StreamStore")
         {
             _serializer = serializer;
             var client = storageAccount.CreateCloudTableClient();
             _table = client.GetTableReference(tableName);
-            _table.CreateIfNotExists();
 
             _developmentStorage = client.BaseUri == CloudStorageAccount.DevelopmentStorageAccount
                                                                         .CreateCloudTableClient()
@@ -48,14 +53,16 @@ namespace Edit.AzureTableStorage
 
             try
             {
-                var result = await _table.ExecuteBatchAsync(batch, token);
+                var table = await GetTable();
+
+                var result = await table.ExecuteBatchAsync(batch, token);
 
                 return
                     new TableStorageVersion(streamName,
                         result.Select(r => (DynamicTableEntity) r.Result)
                             .Where(e => e.RowKey.StartsWith(StreamSequencePrefix)).OrderByAlphaNumeric(e => e.RowKey));
             }
-            catch (StorageException)
+            catch (StorageException e)
             {
                 throw new ConcurrencyException(streamName, expectedVersion);
             }
@@ -84,11 +91,14 @@ namespace Edit.AzureTableStorage
             var continuationToken = new TableContinuationToken();
             var entities = new List<DynamicTableEntity>();
 
+            var table = await GetTable();
+
             if (tableSnapshot != null)
             {
                 var index = Convert.ToInt64(tableSnapshot.RowKey.Split('-')[1]);
                 var count = 0;
                 const int lap = 10;
+
                 do
                 {
                     var streamContinuationToken = new TableContinuationToken();
@@ -104,7 +114,7 @@ namespace Edit.AzureTableStorage
                                              "and", filterCondition);
                     while (streamContinuationToken != null)
                     {
-                        var result = await _table.ExecuteQuerySegmentedAsync(
+                        var result = await table.ExecuteQuerySegmentedAsync(
                                                 new TableQuery { FilterString = streamFilter }, streamContinuationToken, cancellationToken);
                         entities.AddRange(result.Results);
                         count = result.Results.Count;
@@ -115,7 +125,7 @@ namespace Edit.AzureTableStorage
 
                 while (continuationToken != null)
                 {
-                    var result = await _table.ExecuteQuerySegmentedAsync(
+                    var result = await table.ExecuteQuerySegmentedAsync(
                                             new TableQuery { FilterString = causationFilter }, continuationToken, cancellationToken);
                     entities.AddRange(result.Results);
                     continuationToken = result.ContinuationToken;
@@ -124,7 +134,7 @@ namespace Edit.AzureTableStorage
             else
                 while (continuationToken != null)
                 {
-                    var result = await _table.ExecuteQuerySegmentedAsync(
+                    var result = await table.ExecuteQuerySegmentedAsync(
                                             new TableQuery { FilterString = filter }, continuationToken, cancellationToken);
                     entities.AddRange(result.Results);
                     continuationToken = result.ContinuationToken;
