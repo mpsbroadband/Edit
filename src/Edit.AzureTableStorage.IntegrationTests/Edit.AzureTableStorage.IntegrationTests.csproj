@@ -32,6 +32,10 @@
   </PropertyGroup>
   <Import Project=".\Edit.AzureTableStorage.IntegrationTests.Dependencies.targets" />
   <ItemGroup>
+    <Reference Include="AzureApi.Storage, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\AzureApi.Storage.1.0.113\lib\net45\AzureApi.Storage.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Data.OData, Version=5.6.2.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Microsoft.Data.OData.5.8.4\lib\net40\Microsoft.Data.OData.dll</HintPath>
@@ -70,10 +74,6 @@
     <Reference Include="Microsoft.Azure.KeyVault.Core">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Microsoft.Azure.KeyVault.Core.1.0.0\lib\net40\Microsoft.Azure.KeyVault.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="AzureApi.Storage">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\AzureApi.Storage.1.1.8\lib\net45\AzureApi.Storage.dll</HintPath>
     </Reference>
     <Reference Include="Machine.Specifications.Clr4">
       <SpecificVersion>False</SpecificVersion>
