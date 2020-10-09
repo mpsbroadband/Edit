@@ -66,7 +66,7 @@
     </Reference>
     <Reference Include="AzureApi.Storage">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\AzureApi.Storage.1.0.113\lib\net45\AzureApi.Storage.dll</HintPath>
+      <HintPath>..\packages\AzureApi.Storage.1.0.113\lib\net472\AzureApi.Storage.dll</HintPath>
       <Private>True</Private>
     </Reference>
   </ItemGroup>
