@@ -32,9 +32,9 @@
   </PropertyGroup>
   <Import Project=".\Edit.AzureTableStorage.IntegrationTests.Dependencies.targets" />
   <ItemGroup>
-    <Reference Include="AzureApi.Storage, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\AzureApi.Storage.1.0.113\lib\net45\AzureApi.Storage.dll</HintPath>
+    <Reference Include="AzureApi.Storage">
+      <HintPath>..\packages\AzureApi.Storage.1.0.114\lib\net472\AzureApi.Storage.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Microsoft.Data.OData, Version=5.6.2.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
