@@ -10,7 +10,7 @@
 	    </dependencies>
     </metadata>
 	<files>
-		<file src="Edit.dll" target="lib\net45" />
-		<file src="Edit.pdb" target="lib\net45" />
+		<file src="Edit.dll" target="lib\net472" />
+		<file src="Edit.pdb" target="lib\net472" />
 	</files>
 </package>

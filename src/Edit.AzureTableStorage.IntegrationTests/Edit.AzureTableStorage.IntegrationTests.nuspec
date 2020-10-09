@@ -13,7 +13,7 @@
 	    </dependencies>
     </metadata>
 	<files>
-		<file src="Edit.AzureTableStorage.IntegrationTests.dll" target="lib\net45" />
-		<file src="Edit.AzureTableStorage.IntegrationTests.pdb" target="lib\net45" />
+		<file src="Edit.AzureTableStorage.IntegrationTests.dll" target="lib\net472" />
+		<file src="Edit.AzureTableStorage.IntegrationTests.pdb" target="lib\net472" />
 	</files>
 </package>

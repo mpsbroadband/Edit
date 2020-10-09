@@ -11,7 +11,7 @@
 	    </dependencies>
     </metadata>
 	<files>
-		<file src="Edit.JsonNet.dll" target="lib\net45" />
-		<file src="Edit.JsonNet.pdb" target="lib\net45" />
+		<file src="Edit.JsonNet.dll" target="lib\net472" />
+		<file src="Edit.JsonNet.pdb" target="lib\net472" />
 	</files>
 </package>
