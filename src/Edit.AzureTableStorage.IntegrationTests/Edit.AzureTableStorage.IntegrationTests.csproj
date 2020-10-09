@@ -34,7 +34,7 @@
   <ItemGroup>
     <Reference Include="AzureApi.Storage">
       <HintPath>..\packages\AzureApi.Storage.1.0.114\lib\net472\AzureApi.Storage.dll</HintPath>
-      <Private>False</Private>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.Data.OData, Version=5.6.2.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
