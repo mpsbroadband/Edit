@@ -62,7 +62,7 @@ namespace Edit.AzureTableStorage
                         result.Select(r => (DynamicTableEntity) r.Result)
                             .Where(e => e.RowKey.StartsWith(StreamSequencePrefix)).OrderByAlphaNumeric(e => e.RowKey));
             }
-            catch (StorageException e)
+            catch (StorageException)
             {
                 throw new ConcurrencyException(streamName, expectedVersion);
             }
