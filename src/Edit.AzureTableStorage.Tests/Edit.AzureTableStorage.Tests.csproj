@@ -33,8 +33,7 @@
   <Import Project=".\Edit.AzureTableStorage.Tests.Dependencies.targets" />
   <ItemGroup>
     <Reference Include="AzureApi.Storage">
-      <HintPath>..\packages\AzureApi.Storage.1.0.115\lib\net472\AzureApi.Storage.dll</HintPath>
-      <Private>False</Private>
+      <HintPath>..\..\..\CommonDomain\src\packages\AzureApi.Storage.1.0.118\lib\net472\AzureApi.Storage.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
