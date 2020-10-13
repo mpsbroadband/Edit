@@ -36,6 +36,7 @@
   <ItemGroup>
     <Reference Include="AzureApi.Storage">
       <HintPath>..\packages\AzureApi.Storage.1.0.115\lib\net472\AzureApi.Storage.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />

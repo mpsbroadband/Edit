@@ -1,6 +1,6 @@
 ﻿namespace Edit
 {
-    public interface ISnapshotEnvelope<T>
+    public interface ISnapshotEnvelope<out T>
     {
         T Snapshot { get; }
     }
