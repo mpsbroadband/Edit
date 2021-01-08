@@ -1,0 +1,12 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+	<PropertyGroup Label="Package Dependencies">
+		<TargetFramework>net472</TargetFramework>
+		<AspNetCoreVersion>5.0.0</AspNetCoreVersion>
+		<EntityFrameworkVersion>5.0.0</EntityFrameworkVersion>
+	</PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include="Newtonsoft.Json" Version="12.0.3">
+
+		</PackageReference>
+	</ItemGroup>
+</Project>

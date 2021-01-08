@@ -1,0 +1,22 @@
+<Project>
+	<Import Project="dependencies.props" />
+	<PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
+		<TargetFramework>net472</TargetFramework>
+		<Deterministic>true</Deterministic>
+		<PackageProjectUrl>https://github.com/mpsbroadband/Edit</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/mpsbroadband/Edit</RepositoryUrl>
+		<Authors>mpsbroadband Contributors</Authors>
+		<Company>mpsbroadband</Company>
+		<ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+		<EmbedUntrackedSources>true</EmbedUntrackedSources>
+		<TargetFrameworkMonikerAssemblyAttributesPath>$([System.IO.Path]::Combine('$(IntermediateOutputPath)','$(TargetFrameworkMoniker).AssemblyAttributes$(DefaultLanguageSourceExtension)'))</TargetFrameworkMonikerAssemblyAttributesPath>
+	</PropertyGroup>
+	<ItemGroup>
+		<EmbeddedFiles Include="$(GeneratedAssemblyInfoFile)"/>
+		<SourceRoot Include="$(MSBuildThisFileDirectory)/"/>
+		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+		</PackageReference>
+	</ItemGroup>
+</Project>
