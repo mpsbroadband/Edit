@@ -46,7 +46,7 @@ steps:
   displayName: DotNet Pack
   inputs:
     command: 'pack'
-    packagesToPack: '**/*.csproj'
+    packagesToPack: '**/*.csproj;!**/*.Tests.csproj'
     nobuild: true
     versioningScheme: 'byEnvVar'
     versionEnvVar: 'Build.BuildNumber'
