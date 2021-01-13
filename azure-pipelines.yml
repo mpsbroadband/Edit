@@ -9,7 +9,7 @@ trigger:
 pool:
   vmImage: 'windows-latest'
 
-name: '1.0$(Rev:.r)'
+name: '1.1$(Rev:.r)'
 
 variables:
   solution: '**/*.sln'
