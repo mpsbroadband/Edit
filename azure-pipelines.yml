@@ -12,11 +12,24 @@ pool:
 name: '1.1$(Rev:.r)'
 
 variables:
-  solution: '**/*.sln'
-  buildPlatform: 'Any CPU'
-  buildConfiguration: 'Release'
+- group: nugetFeed
+- group: buildConfig
 
+- name: solution
+  value: '**/*.sln'
+  
 steps:
+
+- task: PowerShell@2
+  displayName: Set Nugetfeed based on source branch
+  inputs:
+    targetType: 'inline'
+    script: |
+      switch(${env:BUILD_SOURCEBRANCH}) {
+      'refs/heads/master' {Write-Host "##vso[task.setvariable variable=nugetFeed]$(nugetFeedProd)"; }
+      default {Write-Host "##vso[task.setvariable variable=nugetFeed]$(nugetFeedTest)"; }
+      }
+
 - task: NuGetToolInstaller@1
   displayName: Set Nuget Version
 
@@ -26,7 +39,7 @@ steps:
     command: 'restore'
     restoreSolution: '$(solution)'
     feedsToUse: 'select'
-    vstsFeed: '695e49e5-3fbd-4ddd-9fb4-1baa0618f07c'
+    vstsFeed: '$(nugetFeed)'
 
 - task: VSBuild@1
   displayName: VSBuild
@@ -57,5 +70,5 @@ steps:
     command: 'push'
     packagesToPush: '$(Pipeline.Workspace)/**/*.nupkg;!$(Pipeline.Workspace)/**/*.symbols.nupkg'
     nuGetFeedType: 'internal'
-    publishVstsFeed: '695e49e5-3fbd-4ddd-9fb4-1baa0618f07c'
+    publishVstsFeed: '$(nugetFeed)'
     allowPackageConflicts: true
